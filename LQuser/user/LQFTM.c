@@ -1534,53 +1534,32 @@ u32 duty,  0--500--1000,Í¨¹ýÁ½Â·PWM¿ØÖÆ°ëÇÅµÄÊä³öµçÑ¹£¬Á½¸öÑ¹²îÇý¶¯Ö±Á÷µç»úÕý·´×
 CT_PWM_Duty(CT1_CH0, duty);0--15000
 ÓÃ»§Ò²¿ÉÒÔ×Ô¼ºÐÞ¸Ä±ÈÀýÏµÊý£¬ÒÔ·½±ã×Ô¼ºÊ¹ÓÃ£¬Ä¬ÈÏÎª15
 QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/ 
-void Motor_Duty(u16 Motno, int duty)
-{    
-  //¹éÒ»»¯Îª0--500--1000
-  //if(duty<1001)
-//  {
-//    switch(Motno)
-//    {
-//    case Mot0:
-//      FTM_CnV_REG(FTM0, FTM_CH0) = duty;   //µç»ú£¬
-//      break;
-//    case Mot1:
-//      FTM_CnV_REG(FTM0, FTM_CH1) = duty;   //µç»ú£¬
-//      break;
-//    case Mot2:
-//      FTM_CnV_REG(FTM0, FTM_CH2) = duty;   //µç»ú£¬
-//      break;
-//    case Mot3:
-//      FTM_CnV_REG(FTM0, FTM_CH3) = duty;  //µç»ú£¬
-//      break;
-//    default:
-//      break;
-//    }
-//  }
+void Motor_Duty(u16 Motno, int duty){
+  if(duty < MOTORMAX && duty > MOTORMIN){
+    switch(Motno){
+    case MotR:
+      if(duty > 0){
+        FTM_CnV_REG(FTM0, FTM_CH0) = 0;  //µç»ú
+        FTM_CnV_REG(FTM0, FTM_CH1) = duty;
+      }else{
+        FTM_CnV_REG(FTM0, FTM_CH1) = 0;  //µç»ú
+        FTM_CnV_REG(FTM0, FTM_CH0) = -duty;  //µç»ú
+      }
+      break;
 
-  switch(Motno){
-  case MotR:
-    if(duty > 0){
-      FTM_CnV_REG(FTM0, FTM_CH0) = 0;  //µç»ú
-      FTM_CnV_REG(FTM0, FTM_CH1) = duty;
-    }else{
-      FTM_CnV_REG(FTM0, FTM_CH1) = 0;  //µç»ú
-      FTM_CnV_REG(FTM0, FTM_CH0) = -duty;  //µç»ú
+    case MotL:
+      if(duty > 0){
+        FTM_CnV_REG(FTM0, FTM_CH2) = duty;  //µç»ú
+        FTM_CnV_REG(FTM0, FTM_CH3) = 0;  //µç»ú
+      }else{
+        FTM_CnV_REG(FTM0, FTM_CH3) = -duty;  //µç»ú
+        FTM_CnV_REG(FTM0, FTM_CH2) = 0;  //µç»ú
+      }
+      break;
+
+    default:
+      break;
     }
-    break;
-
-  case MotL:
-    if(duty > 0){
-      FTM_CnV_REG(FTM0, FTM_CH2) = duty;  //µç»ú
-      FTM_CnV_REG(FTM0, FTM_CH3) = 0;  //µç»ú
-    }else{
-      FTM_CnV_REG(FTM0, FTM_CH3) = -duty;  //µç»ú
-      FTM_CnV_REG(FTM0, FTM_CH2) = 0;  //µç»ú
-    }
-    break;
-
-  default:
-    break;
   }
 }
 

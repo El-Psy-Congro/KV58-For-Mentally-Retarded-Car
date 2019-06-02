@@ -17,8 +17,8 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 #include "include.h"
 
 u8 imageData[IMAGEH][IMAGEW];      //图像原始数据存放
-volatile u8 Image_Use[LCDH][LCDW]; //压缩后之后用于存放屏幕显示数据
-u16 Pixle[LCDH][LCDW];              //二值化后用于OLED显示的数据
+volatile u8 Image_Use[GRAPH_HIGHT][GRAPH_WIDTH]; //压缩后之后用于存放屏幕显示数据
+u16 graph[GRAPH_HIGHT][GRAPH_WIDTH];              //二值化后用于OLED显示的数据
 uint8_t threshold;                  //OSTU大津法计算的图像阈值
 volatile u8  Line_Cont=0;          //行计数
 volatile u8  fieldOverFlag=0;    //场标识
@@ -388,27 +388,27 @@ void GetBinarizationValue(void)
   char txt[16];
   
   //累加
-  for(i = 0; i <LCDH; i++)
+  for(i = 0; i <GRAPH_HIGHT; i++)
   {    
-    for(j = 0; j <LCDW; j++)
+    for(j = 0; j <GRAPH_WIDTH; j++)
     {                            
       tv+=Image_Use[i][j];   //累加  
     } 
   }
-  GaveValue=tv/LCDH/LCDW;     //求平均值,光线越暗越小，全黑约35，对着屏幕约160，一般情况下大约100 
+  GaveValue=tv/GRAPH_HIGHT/GRAPH_WIDTH;     //求平均值,光线越暗越小，全黑约35，对着屏幕约160，一般情况下大约100 
 //  sprintf(txt,"%03d:%03d",Threshold,GaveValue);//前者为大津法求得的阈值，后者为平均值  
 //  LCD_P6x8Str(80,1,(u8*)txt);
   //按照均值的比例进行二值化
   GaveValue=GaveValue*7/10+10;        //此处阈值设置，根据环境的光线来设定 
-  for(i = 0; i < LCDH; i++)
+  for(i = 0; i < GRAPH_HIGHT; i++)
   {
-    for(j = 0; j < LCDW; j++)
+    for(j = 0; j < GRAPH_WIDTH; j++)
     {                                
       //if(Image_Use[i][j] >GaveValue)//平均值阈值
       if(Image_Use[i][j] >threshold) //大津法阈值   数值越大，显示的内容越多，较浅的图像也能显示出来    
-        Pixle[i][j] =1;        
+        graph[i][j] =1;        
       else                                        
-        Pixle[i][j] =0;
+        graph[i][j] =0;
     }    
   }
 }
@@ -421,38 +421,40 @@ void Draw_Road(void)
   for(i=8;i<56;i+=8)//6*8=48行 
   {
     LCD_Set_Pos(18,i/8+1);//起始位置
-    for(j=0;j<LCDW;j++)  //列数
+    for(j=0;j<GRAPH_WIDTH;j++)  //列数
     { 
       temp=0;
-      if(Pixle[0+i][j]) temp|=1;
-      if(Pixle[1+i][j]) temp|=2;
-      if(Pixle[2+i][j]) temp|=4;
-      if(Pixle[3+i][j]) temp|=8;
-      if(Pixle[4+i][j]) temp|=0x10;
-      if(Pixle[5+i][j]) temp|=0x20;
-      if(Pixle[6+i][j]) temp|=0x40;
-      if(Pixle[7+i][j]) temp|=0x80;
+      if(graph[0+i][j]) temp|=1;
+      if(graph[1+i][j]) temp|=2;
+      if(graph[2+i][j]) temp|=4;
+      if(graph[3+i][j]) temp|=8;
+      if(graph[4+i][j]) temp|=0x10;
+      if(graph[5+i][j]) temp|=0x20;
+      if(graph[6+i][j]) temp|=0x40;
+      if(graph[7+i][j]) temp|=0x80;
       LCD_WrDat(temp); 	  	  	  	  
     }
   }  
 }
+
+
 //三面以上反数围绕清除噪点
 void Pixle_Filter(void)
 {  
   int nr; //行
   int nc; //列
   
-  for(nr=1; nr<LCDH-1; nr++)
+  for(nr=1; nr<GRAPH_HIGHT-1; nr++)
   {  	    
-    for(nc=1; nc<LCDW-1; nc=nc+1)
+    for(nc=1; nc<GRAPH_WIDTH-1; nc=nc+1)
     {
-      if((Pixle[nr][nc]==0)&&(Pixle[nr-1][nc]+Pixle[nr+1][nc]+Pixle[nr][nc+1]+Pixle[nr][nc-1]>2))         
+      if((graph[nr][nc]==0)&&(graph[nr-1][nc]+graph[nr+1][nc]+graph[nr][nc+1]+graph[nr][nc-1]>2))         
       {
-        Pixle[nr][nc]=1;
+        graph[nr][nc]=1;
       }	
-      else if((Pixle[nr][nc]==1)&&(Pixle[nr-1][nc]+Pixle[nr+1][nc]+Pixle[nr][nc+1]+Pixle[nr][nc-1]<2))         
+      else if((graph[nr][nc]==1)&&(graph[nr-1][nc]+graph[nr+1][nc]+graph[nr][nc+1]+graph[nr][nc-1]<2))         
       {
-        Pixle[nr][nc]=0;
+        graph[nr][nc]=0;
       }	
     }	  
   }  
@@ -481,14 +483,14 @@ void SeekRoad(void)
   {  	    
     for(nc=MAX_COL/2;nc<MAX_COL;nc=nc+1)
     {
-      if(Pixle[nr][nc])
+      if(graph[nr][nc])
       {
         ++temp;
       }			   
     }
     for(nc=0; nc<MAX_COL/2; nc=nc+1)
     {
-      if(Pixle[nr][nc])
+      if(graph[nr][nc])
       {
         --temp;
       }			   
@@ -500,14 +502,14 @@ void SeekRoad(void)
   {  	    
     for(nc=MAX_COL/2;nc<MAX_COL;nc=nc+1)
     {
-      if(Pixle[nr][nc])
+      if(graph[nr][nc])
       {
         ++temp;
       }			   
     }
     for(nc=0; nc<MAX_COL/2; nc=nc+1)
     {
-      if(Pixle[nr][nc])
+      if(graph[nr][nc])
       {
         --temp;
       }			   
@@ -519,14 +521,14 @@ void SeekRoad(void)
   {  	    
     for(nc=MAX_COL/2;nc<MAX_COL;nc=nc+1)
     {
-      if(Pixle[nr][nc])
+      if(graph[nr][nc])
       {
         ++temp;
       }			   
     }
     for(nc=0; nc<MAX_COL/2; nc=nc+1)
     {
-      if(Pixle[nr][nc])
+      if(graph[nr][nc])
       {
         --temp;
       }			   
@@ -551,11 +553,11 @@ void FindTiXing(void)
   {  	    
     for(nc=2;nc<MAX_COL-2;nc++)
     {
-      if((Pixle[nr+8][nc-1]==0)&&(Pixle[nr+8][nc]==0)&&(Pixle[nr+8][nc+1]==1)&&(Pixle[nr+8][nc+2]==1))
+      if((graph[nr+8][nc-1]==0)&&(graph[nr+8][nc]==0)&&(graph[nr+8][nc+1]==1)&&(graph[nr+8][nc+2]==1))
       {
         zb[nr]=nc;//左边沿，越来越大
       }
-      if((Pixle[nr+8][nc-1]==1)&&(Pixle[nr+8][nc]==1)&&(Pixle[nr+8][nc+1]==0)&&(Pixle[nr+8][nc+2]==0))
+      if((graph[nr+8][nc-1]==1)&&(graph[nr+8][nc]==1)&&(graph[nr+8][nc+1]==0)&&(graph[nr+8][nc+2]==0))
       {
         yb[nr]=nc;//右边沿，越来越小
       }                   

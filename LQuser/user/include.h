@@ -65,6 +65,8 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
     #include "L3G4200D.h"
     #include "processing.h"
     #include "filter.h"
+    #include "mathematics.h"
+
 
 
 

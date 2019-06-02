@@ -73,6 +73,11 @@ void SetCutoffFrequency(float sampleFrequent, float cutoffFrequent,butterworthPa
 //
 //}
 
+//梯度下降法 参考 成都信息工程大学 成信WD队      与    CSDN博客  https://blog.csdn.net/nupt123456789/article/details/8281923
+//AND https://blog.csdn.net/pengchengliu/article/details/80932232
+void GradientDescen(int32 sequence[], u8 lenght, gradientDescen *aGradienDescen, u8 stepNumber, int32 inputData){
+
+}
 
 int LinearRCLowPassFiltering(){
 

@@ -22,6 +22,8 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 #define     Servo_Middle      620 //中心位置，每个舵机数值不同
 #define     Servo_Right       500 //右转极限，每个舵机数值不同
 
+#define MOTORMAX 800
+#define MOTORMIN -800
 /**********************************  FTM(引脚复用)已确认20171218*************************/
 
 //      模块通道    端口          可选范围              建议

@@ -21,8 +21,8 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 #define IMAGEH  120  //行 HEIGHT 待采集摄像头图像高度行数
 #define IMAGEW  188  //列 WIDTH  待采集摄像头图像宽度列数
 
-#define LCDH    60  //OLED显示的行数
-#define LCDW    94  //OLED显示的列数
+#define GRAPH_HIGHT    60  //OLED显示的行数
+#define GRAPH_WIDTH    94  //OLED显示的列数
 
 #define SCL_Out     DDRD11=1      //配置输出作为SCL_Out
 #define SDA_Out     DDRD10=1      //配置作为输出作为SDA_Out
@@ -44,6 +44,8 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 extern uint8_t threshold;
 extern volatile u8  fieldOverFlag;
 extern u8 imageData[IMAGEH][IMAGEW];
+extern u16 graph[GRAPH_HIGHT][GRAPH_WIDTH];
+extern volatile u8 Image_Use[GRAPH_HIGHT][GRAPH_WIDTH];
 
 void SendPicture(void);
 

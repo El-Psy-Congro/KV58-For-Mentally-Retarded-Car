@@ -9,7 +9,7 @@ typedef struct{
     double  derivative;         //微分常数 Derivative Const
     int lastError;              //Error[-1]
     int prevError;              //Error[-2]
-    u8  isDeviation;              //返回值是否加上设定值     1为不加，   2为加上设定值
+    bool  isDeviation;              //返回值是否加上设定值     1为不加，   2为加上设定值
 } PID;
 
 void PIDInit(void);
@@ -20,7 +20,7 @@ int IncrementalPID(int NextPoint, PID *aPID);
 //void MotorRightLocPIDCalc(int NextPoint);
 //void ErectLocPIDCalc(int NextPoint);
 
-extern PID PIDServo, PIDMotorLeft, PIDMotorRight, PIDErect;
+extern PID PIDServoOfGraph,PIDServoOfElectromagnetism, PIDMotorLeft, PIDMotorRight, PIDErect;
 
 
 #endif 

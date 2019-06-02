@@ -27,21 +27,21 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 其他说明：无
 **********************************************************/
 
-#define TFTSPI_CS     PTC16_OUT    //CS
-#define TFTSPI_SCL    PTC15_OUT    //SCL
-#define TFTSPI_SDA    PTC14_OUT    //SDI
-#define TFTSPI_DC     PTC13_OUT    //DC
-#define TFTSPI_RST    PTC12_OUT    //RST
+#define TFTSPI_CS     PTE30_OUT    //CS
+#define TFTSPI_SCL    PTE29_OUT    //SCL
+#define TFTSPI_SDA    PTE21_OUT    //SDI
+#define TFTSPI_DC     PTE20_OUT    //DC
+#define TFTSPI_RST    PTE19_OUT    //RST
   
  
 void TFTSPI_Init(void)
 { 	
   //-----端口初始化----//
-  GPIO_Init(GPIOC,12,GPO,0);
-  GPIO_Init(GPIOC,13,GPO,0);
-  GPIO_Init(GPIOC,14,GPO,0);
-  GPIO_Init(GPIOC,15,GPO,0);
-  GPIO_Init(GPIOC,16,GPO,0);  
+  GPIO_Init(GPIOE,19,GPO,0);
+  GPIO_Init(GPIOE,20,GPO,0);
+  GPIO_Init(GPIOE,21,GPO,0);
+  GPIO_Init(GPIOE,29,GPO,0);
+  GPIO_Init(GPIOE,30,GPO,0);
   
   TFTSPI_RST=0;
   time_delay_ms(50);                   
@@ -121,7 +121,9 @@ void TFTSPI_Init(void)
   TFTSPI_Write_Cmd(0xb7);              //LCD Driveing control
   TFTSPI_Write_Byte(0x00);		//CRL=0  
   TFTSPI_Write_Cmd(0x29);   		//开启屏幕显示
-  TFTSPI_Write_Cmd(0x2c);   		//设置为LCD接收数据/命令模式  
+  TFTSPI_Write_Cmd(0x2c);   		//设置为LCD接收数据/命令模式
+
+  monitorSelection = TFT;
 }
 
 void tft18delay_1us(unsigned int Del)		//
@@ -1257,8 +1259,8 @@ void DrawSpectrum(void)
 void TFTSPI_Test(void)
 { 
   
-  TFTSPI_Init();   
-  TFTSPI_CLS(u16BLUE);//蓝色屏幕	
+
+  TFTSPI_CLS(u16WHITE);//蓝色屏幕
   TFTSPI_Show_Logo(0,37);  
   TFTSPI_P16x16Str(0,0,"北京龙邱智能科技",u16RED,u16BLUE);		//字符串显示
   TFTSPI_P8X16Str(0,1,"Long Qiu i.s.t.",u16WHITE,u16BLACK);		//字符串显示  

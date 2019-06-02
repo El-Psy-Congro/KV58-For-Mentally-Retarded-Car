@@ -15,6 +15,14 @@ typedef struct{
 //
 //}kalmanParameter;
 
+typedef struct{
+  u8 count;
+  int32 lastSum;
+  int32 currentOutData;
+  int32 lastOutData;
+  int32 currentVelocity;
+}gradientDescen;
+
 
 extern butterworthParameter Butter_80HZ_Parameter_Acce, Butter_60HZ_Parameter_Acce, Butter_51HZ_Parameter_Acce,
                             Butter_30HZ_Parameter_Acce, Butter_20HZ_Parameter_Acce, Butter_15HZ_Parameter_Acce,

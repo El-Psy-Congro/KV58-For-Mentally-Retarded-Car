@@ -457,7 +457,7 @@ void LCD_Init(void)
   LCD_WrCmd(0xaf);//--turn on oled panel
   LCD_Fill(0x00);  //初始清屏
   LCD_Set_Pos(0,0);  
-  
+  monitorSelection = OLED;
 } 
 //==============================================================
 //函数名： void LCD_PutPixel(unsigned char x,unsigned char y)

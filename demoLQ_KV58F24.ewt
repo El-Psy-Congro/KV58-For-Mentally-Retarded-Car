@@ -2442,6 +2442,12 @@
             <name>$PROJ_DIR$\LQuser\user\filter.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\LQuser\user\mathematics.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\mathematics.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\LQuser\user\menu.c</name>
         </file>
         <file>

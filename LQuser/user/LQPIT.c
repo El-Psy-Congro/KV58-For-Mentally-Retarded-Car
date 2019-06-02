@@ -73,15 +73,15 @@ void PIT1_IRQHandler(){
   PIT_Flag_Clear(PIT1);       //清中断标志位
   LED_Ctrl(LED1, RVS);        //中断发生后LED闪烁
   /*用户添加所需代码*/
-  servo = servoMedian + PositionalPID(GraphProcessing(), &PIDServo);
-  Servo_Duty(servo);
+  DataFusion();
+  Servo_Duty(LimitingAmplitude(servo, 4700, 5800));
 }
 
 void PIT2_IRQHandler(){
   PIT_Flag_Clear(PIT2);       //清中断标志位
   LED_Ctrl(LED3, RVS);
   GyroAngleProcessing();
-  VirtualOscilloscopeData[2] = angle;
+
 
   /*用户添加所需代码*/
 }

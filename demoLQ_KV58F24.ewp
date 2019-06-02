@@ -1063,11 +1063,11 @@
                 </option>
                 <option>
                     <name>Input description</name>
-                    <state>No specifier n, no float nor long long, no scan set, no assignment suppressing.</state>
+                    <state>No specifier n, no float nor long long, no scan set, no assignment suppressing, without multibyte support.</state>
                 </option>
                 <option>
                     <name>Output description</name>
-                    <state>No specifier a, A, no specifier n, no float nor long long.</state>
+                    <state>No specifier a, A, no specifier n, no float nor long long, without multibyte support.</state>
                 </option>
                 <option>
                     <name>GOutputBinary</name>
@@ -2128,6 +2128,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\LQuser\user\filter.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\mathematics.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\mathematics.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\LQuser\user\menu.c</name>

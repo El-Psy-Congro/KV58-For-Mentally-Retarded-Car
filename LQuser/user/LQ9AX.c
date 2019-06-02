@@ -193,7 +193,13 @@ void UpdateAcceleration(){
   ACC_Y.MYBYTE.BYTEH=LQ9AX_DAT[8] = I2C_ReadAddr(I2C_1,  FXOS8700_I2C_ADDR, 0x03);
   LPTMR_delay_us(20);       //至少延时16us，否则爆炸
   ACC_Y.MYBYTE.BYTEL=LQ9AX_DAT[9] = I2C_ReadAddr(I2C_1,  FXOS8700_I2C_ADDR, 0x04);
+}
+
+void UpdateGyro(){
   LPTMR_delay_us(20);
+  GYRO_X.MYBYTE.BYTEH=LQ9AX_DAT[0] = I2C_ReadAddr(I2C_1, FXAS21002_I2C_ADDR, 0x01);//高8位陀螺仪
+  LPTMR_delay_us(20);
+  GYRO_X.MYBYTE.BYTEL=LQ9AX_DAT[1] = I2C_ReadAddr(I2C_1, FXAS21002_I2C_ADDR, 0x02);//低8位
 }
 
 int ReadGyro(){
@@ -206,10 +212,21 @@ int ReadGyro(){
   }
 
   VirtualOscilloscopeData[0] = tem;
-  VirtualOscilloscopeData[1] =  tem = ButtterworthLowPassFiltering(tem, &butterworthOfAcceleration, &Butter_02HZ_Parameter_Acce);
+//  VirtualOscilloscopeData[1] =  tem = angleFromAcceleration = ButtterworthLowPassFiltering(tem, &butterworthOfAcceleration, &Butter_10HZ_Parameter_Acce);
+
+//  UpdateGyro();
+//  angleFromGyro -= ((GYRO_X.MYWORD + gyroLast) * 0.01);
+//  gyroLast = GYRO_X.MYWORD;
+  angleFromGyro +=  0.155;
+  VirtualOscilloscopeData[2] = angleFromGyro;
+  VirtualOscilloscopeData[3] = GYRO_X.MYWORD;
   VirtualOscilloscope(VirtualOscilloscopeData);
 
   return tem;
+}
+
+void GyroInit(){
+  angleFromGyro = ReadGyro();
 }
 
 void Cvt_14bit_Str(char str[],LQ9AXt V2)

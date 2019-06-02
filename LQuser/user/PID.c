@@ -1,32 +1,38 @@
 #include "include.h"
 
-PID PIDServo, PIDMotorLeft, PIDMotorRight, PIDErect;
+PID PIDServoOfGraph,PIDServoOfElectromagnetism, PIDMotorLeft, PIDMotorRight, PIDErect;
 int speedSet = 0;
 
 void PIDInit(){
-  PIDServo.setPoint = 0;
-  PIDServo.proportion = 1.75;  //0.27
-  PIDServo.integral = 0;
-  PIDServo.derivative = 0;
-  PIDServo.isDeviation = 0;
+  PIDServoOfGraph.setPoint = 0;
+  PIDServoOfGraph.proportion = 17;  //0.27
+  PIDServoOfGraph.integral = 0;
+  PIDServoOfGraph.derivative = 0;
+  PIDServoOfGraph.isDeviation = false;
 
-  PIDMotorLeft.setPoint = 200;
-  PIDMotorLeft.proportion = 1;
-  PIDMotorLeft.integral = 0.011;
+  PIDServoOfElectromagnetism.setPoint = 0;
+  PIDServoOfElectromagnetism.proportion = 0.17;  //0.27
+  PIDServoOfElectromagnetism.integral = 0;
+  PIDServoOfElectromagnetism.derivative = 0;
+  PIDServoOfElectromagnetism.isDeviation = false;
+
+  PIDMotorLeft.setPoint = 0;
+  PIDMotorLeft.proportion = 0.010;
+  PIDMotorLeft.integral = 0.007;
   PIDMotorLeft.derivative = 0;
-  PIDMotorLeft.isDeviation = 1;
+  PIDMotorLeft.isDeviation = true;
 
-  PIDMotorRight.setPoint = 200;
-  PIDMotorRight.proportion = 1;
-  PIDMotorRight.integral = 0.011;
+  PIDMotorRight.setPoint = 120;
+  PIDMotorRight.proportion = 0.30;
+  PIDMotorRight.integral = 0.30;
   PIDMotorRight.derivative = 0;
-  PIDMotorRight.isDeviation = 1;
+  PIDMotorRight.isDeviation = true;
 
   PIDErect.setPoint = 2100;
   PIDErect.proportion =0.8;
   PIDErect.integral = 0.000;
   PIDErect.derivative = 0;
-  PIDErect.isDeviation = 0;
+  PIDErect.isDeviation = false;
 }
 
 
@@ -61,6 +67,7 @@ int IncrementalPID(int NextPoint, PID *aPID){
   int  currentError, proportionVariable, integralVariable, derivativeVariable;
   
   currentError = aPID->setPoint - NextPoint;
+  aPID->sumError += currentError;
 
   proportionVariable = currentError - aPID->lastError;
   integralVariable = currentError;
