@@ -41,7 +41,9 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 #define MAX_ROW   60
 #define MAX_COL   94 
 
-extern uint8_t Threshold;
+extern uint8_t threshold;
+extern volatile u8  fieldOverFlag;
+extern u8 imageData[IMAGEH][IMAGEW];
 
 void SendPicture(void);
 
@@ -59,6 +61,7 @@ extern void MT9V034_SetReservedReg(void);
 extern void MT9V034_SetFrameRate(uint8_t frameRate);
 extern void MT9V034_SetFrameResolution(uint16_t height,uint16_t width);
 extern void MT9V034_SetAutoExposure(bool enable);
+void GetUseImage(void);
 
 void UARTSendPicture(uint8_t tmImage[IMAGEH][IMAGEW]) ;
 uint8_t GetOSTU(uint8_t tmImage[IMAGEH][IMAGEW]) ;
@@ -69,10 +72,10 @@ void Cam_Init(void);
 void Get_Pixel(void);
 void Get_Back(void);
 void Draw_Road(void);
-void Get_Use_Image(void);
-void Get_01_Value(void);
+void GetUseImage(void);
+void GetBinarizationValue(void);
 void Pixle_Filter(void);
-void Seek_Road(void);
+void SeekRoad(void);
 void FindTiXing(void);
 int MT9V034(void);
 void UARTSendPicture2(uint8_t tmImage[IMAGEH][IMAGEW]) ;

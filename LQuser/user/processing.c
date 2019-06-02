@@ -1,8 +1,26 @@
 #include "include.h"
 
-int16 servoMedian = 5125;
+int servoMedian = 5140, graphMedian = 0, servo = 0, angle = 0;
+int GraphProcessing(){
+  if(fieldOverFlag)  {
+    GetUseImage();    //采集图像数据存放数组
+    threshold = GetOSTU(imageData); //OSTU大津法 获取全局阈值
+    GetBinarizationValue();     //二值化图像数据
+
+    GraphProcessingOfEdgeFluctuation();
+
+    //EnableInterrupts
+    fieldOverFlag = 0;
+    
+  }
+  return graphMedian;
+}
 
 int GraphProcessingOfEdgeFluctuation(){
+  //    Pixle[i][j]
+}
+
+int ElectromagnetismProcessing(){
 
 }
 
@@ -12,12 +30,16 @@ int ElectromagnetismProcessingOfBasics(){
              /(ADC0_Ave(ADCRemawp[3],ADC_16bit,10)+ADC0_Ave(ADCRemawp[0],ADC_16bit,10)+ADC0_Ave(ADCRemawp[2],ADC_16bit,10)+ADC0_Ave(ADCRemawp[1],ADC_16bit,10));
 }
 
-uint8_t ElectromagnetismProcessingOfLoseDataForStop(){
+bool ElectromagnetismProcessingOfLoseDataForStop(){
 
 }
 
 void GyroAngleProcessing(){
-  PIDMotorRight.setPoint = PIDMotorLeft.setPoint = -PositionalPID(ReadGyro(), &PIDErect);
+  angle = ReadGyro() - PIDErect.setPoint;
+  if(angle<900 && angle > -1600){
+    PIDMotorRight.setPoint = PIDMotorLeft.setPoint = -angle;
+  }
+
 
 }
 

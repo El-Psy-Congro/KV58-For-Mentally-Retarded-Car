@@ -30,7 +30,7 @@ typedef enum PITn
     PIT3
 } PITn;
 
-extern short speedLeftGet, speedRightGet;
+extern int speedLeftGet, speedRightGet;
 
 /*********************** PIT功能函数 **************************/
 void PIT_Init(PITn, u32 cnt);                                            //初始化PITn，并设置定时时间(单位为bus时钟周期)

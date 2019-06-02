@@ -16,12 +16,12 @@
 QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 #include "include.h"
 
-u8 Image_Data[IMAGEH][IMAGEW];      //图像原始数据存放
+u8 imageData[IMAGEH][IMAGEW];      //图像原始数据存放
 volatile u8 Image_Use[LCDH][LCDW]; //压缩后之后用于存放屏幕显示数据
 u16 Pixle[LCDH][LCDW];              //二值化后用于OLED显示的数据
-uint8_t Threshold;                  //OSTU大津法计算的图像阈值
+uint8_t threshold;                  //OSTU大津法计算的图像阈值
 volatile u8  Line_Cont=0;          //行计数
-volatile u8  Field_Over_Flag=0;    //场标识
+volatile u8  fieldOverFlag=0;    //场标识
 
 int OFFSET0=0;      //最远处，赛道中心值综合偏移量
 int OFFSET1=0;      //第二格
@@ -43,7 +43,7 @@ void PORTD_IRQHandler(void)
       Line_Cont=0; 
       return ;
     }
-    DMATransDataStart(DMA_CH4,(uint32_t)(&Image_Data[Line_Cont][0]),IMAGEW); //DMA开始传输数据PTD12管脚触发
+    DMATransDataStart(DMA_CH4,(uint32_t)(&imageData[Line_Cont][0]),IMAGEW); //DMA开始传输数据PTD12管脚触发
     ++Line_Cont;            //行计数
     return ;
   }
@@ -53,7 +53,7 @@ void PORTD_IRQHandler(void)
     PORTD_ISFR |= 0x4000;  //清除中断标识    
     // 用户程序 
     Line_Cont = 0;         //行计数清零
-    Field_Over_Flag=1;     //场结束标识
+    fieldOverFlag=1;     //场结束标识
     return ;
   }   
 } 
@@ -66,18 +66,19 @@ int MT9V034(void)
   //LCD_Show_Frame100();    //画图像 LCDW*LCDH 外框
   
   LED_Ctrl(LED1, RVS);  //LED指示程序运行状态
-  if(Field_Over_Flag)   //完成一场图像采集后显示并发送数据到上位机
+  if(fieldOverFlag)   //完成一场图像采集后显示并发送数据到上位机
   {
-    Get_Use_Image();    //采集图像数据存放数组
-    Get_01_Value();     //二值化图像数据
-              
-    Threshold = GetOSTU(Image_Data); //OSTU大津法 获取全局阈值
-    BinaryImage(Image_Data,Threshold); //二值化图像数据
 
-    Seek_Road();
+    GetUseImage();    //采集图像数据存放数组
+    threshold = GetOSTU(imageData); //OSTU大津法 获取全局阈值
+    GetBinarizationValue();     //二值化图像数据
+    SeekRoad();
+
+
+
 //    Draw_Road();        //龙邱OLED模块显示动态图像
-    Field_Over_Flag= 0;
-    
+    fieldOverFlag= 0;
+
     //串口发送数据非常慢，注释掉OLED刷新很快
     //  UARTSendPicture(Image_Data);//发送数据到上位机，注意协议格式，不同的上位机看原函数对应修改
     //EnableInterrupts
@@ -196,7 +197,7 @@ void MT9V034_Init(void)
 
   SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_RESET, 0x03);          //0x0c  复位
   
-  DMATransDataInit(DMA_CH4,(void*)&PTD_BYTE0_IN,(void*)Image_Data,PTD12,DMA_BYTE1,IMAGEW,DMA_rising_down);//初始化DMA采集  
+  DMATransDataInit(DMA_CH4,(void*)&PTD_BYTE0_IN,(void*)imageData,PTD12,DMA_BYTE1,IMAGEW,DMA_rising_down);//初始化DMA采集  
 
 }
 void MT9V034_SetFrameResolution(uint16_t height,uint16_t width)
@@ -362,7 +363,7 @@ __ramfunc void DMATransDataStart(uint8_t CHn,uint32_t address,uint32_t Val)
 } 
 
 // 获取需要的图像数据
-__ramfunc void Get_Use_Image(void)
+__ramfunc void GetUseImage(void)
 {
   int i = 0,j = 0,row = 0,line = 0;
   
@@ -370,7 +371,7 @@ __ramfunc void Get_Use_Image(void)
   {
     for(j = 0;j < IMAGEW; j+=2)  //188，
     {        
-      Image_Use[row][line] = Image_Data[i][j];         
+      Image_Use[row][line] = imageData[i][j];         
       line++;        
     }      
     line = 0;
@@ -379,7 +380,7 @@ __ramfunc void Get_Use_Image(void)
 }
 
 //按照均值的比例进行二值化
-void Get_01_Value(void)
+void GetBinarizationValue(void)
 {
   int i = 0,j = 0;
   u8 GaveValue;
@@ -404,7 +405,7 @@ void Get_01_Value(void)
     for(j = 0; j < LCDW; j++)
     {                                
       //if(Image_Use[i][j] >GaveValue)//平均值阈值
-      if(Image_Use[i][j] >Threshold) //大津法阈值   数值越大，显示的内容越多，较浅的图像也能显示出来    
+      if(Image_Use[i][j] >threshold) //大津法阈值   数值越大，显示的内容越多，较浅的图像也能显示出来    
         Pixle[i][j] =1;        
       else                                        
         Pixle[i][j] =0;
@@ -469,7 +470,7 @@ void Pixle_Filter(void)
 *            如果面积为负数，数值越大说明越偏左边；                        *
 *            如果面积为正数，数值越大说明越偏右边。                        *
 ***************************************************************************/ 
-void Seek_Road(void)
+void SeekRoad(void)
 {  
   int nr; //行
   int nc; //列
@@ -934,8 +935,8 @@ uint8_t GetOSTU(uint8_t tmImage[IMAGEH][IMAGEW])
   int32_t PixelFore = 0; 
   double OmegaBack, OmegaFore, MicroBack, MicroFore, SigmaB, Sigma; // 类间方差; 
   int16_t MinValue, MaxValue; 
-  uint8_t Threshold = 0;
   uint8_t HistoGram[256];              //  
+  threshold = 0;
 
   for (j = 0; j < 256; j++)  HistoGram[j] = 0; //初始化灰度直方图 
   
@@ -975,10 +976,10 @@ uint8_t GetOSTU(uint8_t tmImage[IMAGEH][IMAGEW])
     if (Sigma > SigmaB)                    //遍历最大的类间方差g //找出最大类间方差以及对应的阈值
     {
       SigmaB = Sigma;
-      Threshold = j;
+      threshold = j;
     }
   }
-  return Threshold;                        //返回最佳阈值;
+  return threshold;                        //返回最佳阈值;
 } 
 /*************************************************************** 
 * 

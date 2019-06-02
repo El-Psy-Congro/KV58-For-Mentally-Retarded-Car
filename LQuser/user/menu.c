@@ -6,7 +6,7 @@
 #define NUMBER_OF_MOTOR 4
 #define NUMBER_OF_ERECT 4
 #define NUMBER_OF_ADC 5
-#define VARIATION_SPEED_PID 0.001
+#define VARIATION_SPEED_PID 0.1
 #define VARIATION_SERVO_PID 0.001
 #define VARIATION_ERECT_PID 0.001
 #define VARIATION_SPEED 10
@@ -29,9 +29,9 @@ void MenuInit(){
   MenuPageAdd(MenuOfServo);
   MenuPageAdd(MenuOfMotorLeft);
   MenuPageAdd(MenuOfMotorRight);
-//  MenuPageAdd(MenuOfERECT);
-//  MenuPageAdd(MenuOfGyro);
-//  MenuPageAdd(MenuOfADCshow);
+  MenuPageAdd(MenuOfERECT);
+  MenuPageAdd(MenuOfGyro);
+  MenuPageAdd(MenuOfADCshow);
 //  MenuPageAdd(MenuOfADCMedia);
 //  MenuPageAdd(menuOfSpeedMeasure);
   menus = head;
@@ -80,8 +80,8 @@ void MenuPageAdd(void (*aPage)(void)) {
 void MenuOfCameraImage(){
   LCD_Show_Frame100();
   Draw_Road();
-  LCD_P8x16Str(0,0,"Camera Image");
-  sprintf(txt,"%03d",Threshold);
+  LCD_P8x16Str(0,0,"GraphP");
+  sprintf(txt,"%03d",threshold);
   LCD_P6x8Str(100,1,(u8*)txt);
 }
 
@@ -346,6 +346,9 @@ void MenuOfServo(){
   sprintf(txt, "%04d", servoMedian);
   LCD_P8x16Str(80, 4, (u8*) txt);
 
+  sprintf(txt, "%04d", servo);
+  LCD_P8x16Str(80, 6, (u8*) txt);
+
 
   LCD_P8x16Str(0,0,"Servo Adjust");
     
@@ -360,33 +363,36 @@ void MenuOfServo(){
 
 
 void MenuOfGyro(){
-  u16 tem=0;
-  float fv=0.01;
-  char  txt[16]="X:";
-  Update9AX();
-  if (GYRO_X.MYBYTE.BYTEH > 0x7F)            //判断加速度X轴正负,此处为负值
-  {
-    tem = (~(GYRO_X.MYWORD >> 2) + 1) & 0X3FFF;  //把补码数值转换为有效值
-  } else                                    //正数情况处理
-  {
-    tem = (GYRO_X.MYWORD >> 2) & 0X3FFF;          //转换为有效值
-  }
-  sprintf(txt, "DJ0:%04d", GYRO_Y.MYWORD);             //数值转换为字符串
-  LCD_P8x16Str(10, 0, (uint8*) txt);          //OLED屏显示转向数值
+//  u16 tem=0;
+//  float fv=0.01;
+//  char  txt[16]="X:";
+//  Update9AX();
+//  if (GYRO_X.MYBYTE.BYTEH > 0x7F)            //判断加速度X轴正负,此处为负值
+//  {
+//    tem = (~(GYRO_X.MYWORD >> 2) + 1) & 0X3FFF;  //把补码数值转换为有效值
+//  } else                                    //正数情况处理
+//  {
+//    tem = (GYRO_X.MYWORD >> 2) & 0X3FFF;          //转换为有效值
+//  }
+//  sprintf(txt, "DJ0:%04d", GYRO_Y.MYWORD);             //数值转换为字符串
+//  LCD_P8x16Str(10, 0, (uint8*) txt);          //OLED屏显示转向数值
+//
+//  //转换为加速度数值
+//  Cvt_14bit_Str(txt, ACC_X);                //加速度数值专为固定格式字符串，方便屏幕显示
+//  LCD_P6x8Str(10, 4, (uint8*) txt);           //OLED屏显示数值
+//
+//  //温度检测
+//  if (LQ9AX_DAT[18] > 0x7F)                   //温度位正数0--125°
+//  {
+//    LCD_P6x8Str(10, 6, (uint8*) "low temp  ");    //OLED屏显示数值
+//  } else {
+//    sprintf(txt, "temp:+%03d ", LQ9AX_DAT[18]);  //转换为字符串
+//    LCD_P6x8Str(10, 6, (uint8*) txt);             //OLED屏显示数值
+//  }
+//  time_delay_ms(100);
 
-  //转换为加速度数值
-  Cvt_14bit_Str(txt, ACC_X);                //加速度数值专为固定格式字符串，方便屏幕显示
-  LCD_P6x8Str(10, 4, (uint8*) txt);           //OLED屏显示数值
-
-  //温度检测
-  if (LQ9AX_DAT[18] > 0x7F)                   //温度位正数0--125°
-  {
-    LCD_P6x8Str(10, 6, (uint8*) "low temp  ");    //OLED屏显示数值
-  } else {
-    sprintf(txt, "temp:+%03d ", LQ9AX_DAT[18]);  //转换为字符串
-    LCD_P6x8Str(10, 6, (uint8*) txt);             //OLED屏显示数值
-  }
-  time_delay_ms(100);
+    sprintf(txt, "DJ0:%04d", angle);             //数值转换为字符串
+    LCD_P8x16Str(10, 0, (uint8*) txt);
 }
 
 

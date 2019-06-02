@@ -56,12 +56,11 @@ void PIT_Init(PITn pitn, u32 cnt)
 //简  例: 由初始化决定，多长时间进入一次
 //-------------------------------------------------------------------------*
 //short speed=0;
-short speedLeftGet, speedRightGet;
+int speedLeftGet, speedRightGet;
 
-void PIT0_IRQHandler()
-{
-  PIT_Flag_Clear(PIT0);       //清中断标志位
+void PIT0_IRQHandler(){
 // 用户添加所需代码
+  PIT_Flag_Clear(PIT0);
   LED_Ctrl(LED0, RVS);        //中断发生后LED闪烁
   speedLeftGet = FTM_AB_Get(FTM1);
   speedRightGet = -FTM_AB_Get(FTM2);
@@ -72,20 +71,25 @@ void PIT0_IRQHandler()
 
 void PIT1_IRQHandler(){
   PIT_Flag_Clear(PIT1);       //清中断标志位
-  LED_Ctrl(LED3, RVS);        //中断发生后LED闪烁
-
+  LED_Ctrl(LED1, RVS);        //中断发生后LED闪烁
   /*用户添加所需代码*/
+  servo = servoMedian + PositionalPID(GraphProcessing(), &PIDServo);
+  Servo_Duty(servo);
 }
 
-void PIT2_IRQHandler()
-{
+void PIT2_IRQHandler(){
   PIT_Flag_Clear(PIT2);       //清中断标志位
+  LED_Ctrl(LED3, RVS);
+  GyroAngleProcessing();
+  VirtualOscilloscopeData[2] = angle;
+
   /*用户添加所需代码*/
 }
 
 void PIT3_IRQHandler()
 {
   PIT_Flag_Clear(PIT3);       //清中断标志位
+  Menu();
   /*用户添加所需代码*/
 }
 

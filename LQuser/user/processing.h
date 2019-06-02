@@ -1,11 +1,16 @@
 #ifndef _PROCESSING_H
 #define _PROCESSING_H
 
-extern int16 servoMedian;
+
+extern int32 servoMedian, servo, angle;
 
 void GyroAngleProcessing();
+
+int GraphProcessing();
 int GraphProcessingOfEdgeFluctuation();
+
+int ElectromagnetismProcessing();
 int ElectromagnetismProcessingOfBasics();
-uint8_t ElectromagnetismProcessingOfLoseDataForStop();
+bool ElectromagnetismProcessingOfLoseDataForStop();
 
 #endif

@@ -5,25 +5,25 @@ int speedSet = 0;
 
 void PIDInit(){
   PIDServo.setPoint = 0;
-  PIDServo.proportion = 0.007;  //0.27
+  PIDServo.proportion = 1.75;  //0.27
   PIDServo.integral = 0;
   PIDServo.derivative = 0;
   PIDServo.isDeviation = 0;
 
   PIDMotorLeft.setPoint = 200;
-  PIDMotorLeft.proportion = 0.090;
-  PIDMotorLeft.integral = 0.090;
+  PIDMotorLeft.proportion = 1;
+  PIDMotorLeft.integral = 0.011;
   PIDMotorLeft.derivative = 0;
   PIDMotorLeft.isDeviation = 1;
 
   PIDMotorRight.setPoint = 200;
-  PIDMotorRight.proportion = 0.090;
-  PIDMotorRight.integral = 0.090;
+  PIDMotorRight.proportion = 1;
+  PIDMotorRight.integral = 0.011;
   PIDMotorRight.derivative = 0;
   PIDMotorRight.isDeviation = 1;
 
-  PIDErect.setPoint = 2700;
-  PIDErect.proportion =0.4;
+  PIDErect.setPoint = 2100;
+  PIDErect.proportion =0.8;
   PIDErect.integral = 0.000;
   PIDErect.derivative = 0;
   PIDErect.isDeviation = 0;

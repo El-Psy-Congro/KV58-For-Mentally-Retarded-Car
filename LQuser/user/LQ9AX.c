@@ -156,7 +156,7 @@ void Update9AX(void)
   time_delay_ms(1);
   GYRO_Z.MYBYTE.BYTEL=LQ9AX_DAT[5] = I2C_ReadAddr(I2C_1, FXAS21002_I2C_ADDR, 0x06);
   time_delay_ms(1);
-  
+
   ACC_X.MYBYTE.BYTEH=LQ9AX_DAT[6] = I2C_ReadAddr(I2C_1,  FXOS8700_I2C_ADDR, 0x01);  //高8位加速度,
   time_delay_ms(1);
   ACC_X.MYBYTE.BYTEL=LQ9AX_DAT[7] = I2C_ReadAddr(I2C_1,  FXOS8700_I2C_ADDR, 0x02);  //低6位
@@ -169,7 +169,7 @@ void Update9AX(void)
   time_delay_ms(1);
   ACC_Z.MYBYTE.BYTEL=LQ9AX_DAT[11] = I2C_ReadAddr(I2C_1, FXOS8700_I2C_ADDR, 0x06);
   time_delay_ms(1);
-  
+
   MAG_X.MYBYTE.BYTEH=LQ9AX_DAT[12] = I2C_ReadAddr(I2C_1, FXOS8700_I2C_ADDR, 0x33); //高8位地磁传感器
   time_delay_ms(1);
   MAG_X.MYBYTE.BYTEL=LQ9AX_DAT[13] = I2C_ReadAddr(I2C_1, FXOS8700_I2C_ADDR, 0x34); //低8位
@@ -182,25 +182,32 @@ void Update9AX(void)
   time_delay_ms(1);
   MAG_Z.MYBYTE.BYTEL=LQ9AX_DAT[17] = I2C_ReadAddr(I2C_1, FXOS8700_I2C_ADDR, 0x38);
   time_delay_ms(1);
-  
+
   LQ9AX_DAT[18] = I2C_ReadAddr(I2C_1, FXOS8700_I2C_ADDR, 0x51);//温度传感器-40~125°
   time_delay_ms(1);
   //Data_Send_Senser();
   //time_delay_ms(100);
 }
 
+void UpdateAcceleration(){
+  ACC_Y.MYBYTE.BYTEH=LQ9AX_DAT[8] = I2C_ReadAddr(I2C_1,  FXOS8700_I2C_ADDR, 0x03);
+  LPTMR_delay_us(20);       //至少延时16us，否则爆炸
+  ACC_Y.MYBYTE.BYTEL=LQ9AX_DAT[9] = I2C_ReadAddr(I2C_1,  FXOS8700_I2C_ADDR, 0x04);
+  LPTMR_delay_us(20);
+}
+
 int ReadGyro(){
   int tem=0;
-  Update9AX();
+  UpdateAcceleration();
   if(ACC_Y.MYBYTE.BYTEH > 0x7F){
     tem= (~(ACC_Y.MYWORD>>2) + 1)&0X3FFF;
   }else{
     tem=(ACC_Y.MYWORD>>2)&0X3FFF;
   }
 
-  if(tem > 4000){
-    return 4000;
-  }
+  VirtualOscilloscopeData[0] = tem;
+  VirtualOscilloscopeData[1] =  tem = ButtterworthLowPassFiltering(tem, &butterworthOfAcceleration, &Butter_02HZ_Parameter_Acce);
+  VirtualOscilloscope(VirtualOscilloscopeData);
 
   return tem;
 }

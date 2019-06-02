@@ -146,20 +146,25 @@ void main(void)
   Servo_Init();                 //舵机初始化
   Motor_Init();                 //电机初始化
   PIDInit();
-  Init_LQ_9AX();
+//  Init_LQ_9AX();
+  ButterworthParameterInit();   //巴特沃斯低通滤波初始化
   FTM_AB_Init(FTM1);            //编码器初始化
   FTM_AB_Init(FTM2);            //编码器初始化
-  PIT_Init(PIT1, 100);          //定时器1初始化
-  PIT_Init(PIT0, 100);          //定时器0初始化
   MenuInit();                   //菜单初始化
   ADC0_Init();                  //ADC初始化
+  PIT_Init(PIT0, 10);           //定时器0初始化
+  PIT_Init(PIT1, 25);           //定时器1初始化
+//  PIT_Init(PIT2, 5);            //定时器2初始化
+//  PIT_Init(PIT3, 70);            //定时器2初始化
+
+
 
 
 
 
   LCD_CLS();                    //清屏
 //  LCD_Show_LQLogo();          //显示龙邱LOGO
-  LCD_P14x16Str(0,0,"16");    //字符串显示
+  LCD_P14x16Str(0,0,"16");      //字符串显示
   
 
  
@@ -174,7 +179,7 @@ void main(void)
   Servo_Duty(servoMedian);
   time_delay_ms(5);        //延时
   EnableInterrupts          //中断使能
-  LED_Ctrl(LEDALL, OFF);   
+  LED_Ctrl(LEDALL, OFF);
   //-----------------------------------------------------------------------------------------  
   //  测试函数都是死循环，每次只能开启一个
   //-----------------------------------------------------------------------------------------
@@ -201,10 +206,14 @@ void main(void)
 
   while(1){
 //    BEE_OFF;
-//    VirtualOscilloscopeData[0] = ReadGyro();
+
 //    VirtualOscilloscope(VirtualOscilloscopeData);
 //    GyroAngleProcessing();
+//    Servo_Duty(servoMedian);
     Menu();
+
+//    ReadGyro();
+    LED_Ctrl(LED2, RVS);
 
     
   }
