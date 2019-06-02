@@ -21,7 +21,7 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 #define IMAGEH  120  //行 HEIGHT 待采集摄像头图像高度行数
 #define IMAGEW  188  //列 WIDTH  待采集摄像头图像宽度列数
 
-#define GRAPH_HIGHT    60  //OLED显示的行数
+#define GRAPH_HIGHT    120  //OLED显示的行数
 #define GRAPH_WIDTH    94  //OLED显示的列数
 
 #define SCL_Out     DDRD11=1      //配置输出作为SCL_Out

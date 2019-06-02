@@ -5,10 +5,10 @@
 #define NUMBER_OF_PID 4
 #define NUMBER_OF_MOTOR 4
 #define NUMBER_OF_ERECT 4
-#define NUMBER_OF_ADC 5
+#define NUMBER_OF_ADC 8
 #define NUMBER_OF_GRAPH_SPREAD 2
 #define VARIATION_SPEED_PID 0.001
-#define VARIATION_GRAPH_PID 1
+#define VARIATION_GRAPH_PID 0.1
 #define VARIATION_Electromagnetism_PID 0.01
 #define VARIATION_ERECT_PID 0.001
 #define VARIATION_SPEED 10
@@ -27,11 +27,14 @@ monitor monitorSelection;
 short menuPages = 0;
 char txt[16];
 
-/**************************
-菜单初始化
-将写好的菜单页使用MenuPageAdd();添加即可使用
-菜单页的添加顺序就是菜单的顺序
-**************************/
+
+
+/*菜单初始化函数
+ *作用：
+ *  将写好的菜单页函数存储到链表中，然后使用按键进行切换
+ *使用方法：
+ *  将写好的菜单页函数使用MenuPageAdd()添加；
+ */
 void MenuInit(){
   if(monitorSelection == OLED){
     //OLED的菜单页放这里
@@ -54,6 +57,10 @@ void MenuInit(){
   menus = head;
 }
 
+
+/*
+ * 菜单页切换函数
+ */
 void Menu(){
 
   if(!KEY_Read(left)){
@@ -72,6 +79,10 @@ void Menu(){
     (*menus->page)();
 }
 
+
+/*
+ * 菜单页添加函数
+ */
 void MenuPageAdd(void (*aPage)(void)) {
   menu *node = NULL;
   node = (menu *)malloc(sizeof(menu));
@@ -107,6 +118,7 @@ void TFTMenuOfMT9V034(){
 }
 
 
+
 void OLEDMenuOfGraphSpread(){
   if(!KEY_Read(middle)){
     time_delay_ms(700);
@@ -134,7 +146,9 @@ void OLEDMenuOfGraphSpread(){
   }
 }
 
-
+/*
+ * 摄像头图像显示
+ */
 void OLEDMenuOfCameraImage(){
   LCD_Show_Frame100();
   Draw_Road();
@@ -144,8 +158,12 @@ void OLEDMenuOfCameraImage(){
 }
 
 
+/*
+ * 直立PID参数调整
+ */
 void OLEDMenuOfERECT(){
   if (!KEY_Read(middle)) {
+    time_delay_ms(100);
     if (!KEY_Read(middle)) {
       menuSwitch++;
       LCD_CLS();
@@ -153,6 +171,7 @@ void OLEDMenuOfERECT(){
   }
 
   if (!KEY_Read(up)) {
+    time_delay_ms(100);
     if (!KEY_Read(up)) {
       if (menuSwitch == 0) {
         PIDErect.proportion += VARIATION_ERECT_PID;
@@ -165,6 +184,7 @@ void OLEDMenuOfERECT(){
       }
     }
   }else if(!KEY_Read(down)) {
+    time_delay_ms(100);
     if (!KEY_Read(down)) {
       if (menuSwitch == 0) {
         PIDErect.proportion -= VARIATION_ERECT_PID;
@@ -211,8 +231,12 @@ void OLEDMenuOfERECT(){
 }
 
 
+/*
+ * 右电机参数调整
+ */
 void OLEDMenuOfMotorRight(){
   if (!KEY_Read(middle)) {
+    time_delay_ms(100);
     if (!KEY_Read(middle)) {
       menuSwitch++;
       LCD_CLS();
@@ -221,6 +245,7 @@ void OLEDMenuOfMotorRight(){
   menuSwitch = menuSwitch % NUMBER_OF_MOTOR;
 
   if (!KEY_Read(up)) {
+    time_delay_ms(100);
     if (!KEY_Read(up)) {
       if (menuSwitch == 0) {
         PIDMotorRight.proportion += VARIATION_SPEED_PID;
@@ -233,6 +258,7 @@ void OLEDMenuOfMotorRight(){
       }
     }
   }else if(!KEY_Read(down)) {
+    time_delay_ms(100);
     if (!KEY_Read(down)) {
       if (menuSwitch == 0) {
         PIDMotorRight.proportion -= VARIATION_SPEED_PID;
@@ -275,10 +301,12 @@ void OLEDMenuOfMotorRight(){
 
 }
 
-
+/*
+ * 左电机参数调整
+ */
 void OLEDMenuOfMotorLeft(){
   if (!KEY_Read(middle)) {
-
+    time_delay_ms(100);
     if (!KEY_Read(middle)) {
       menuSwitch++;
       LCD_CLS();
@@ -287,6 +315,7 @@ void OLEDMenuOfMotorLeft(){
   menuSwitch = menuSwitch % NUMBER_OF_MOTOR;
 
   if (!KEY_Read(up)) {
+    time_delay_ms(100);
     if (!KEY_Read(up)) {
       if (menuSwitch == 0) {
         PIDMotorLeft.proportion += VARIATION_SPEED_PID;
@@ -299,6 +328,7 @@ void OLEDMenuOfMotorLeft(){
       }
     }
   } else if (!KEY_Read(down)) {
+    time_delay_ms(100);
     if (!KEY_Read(down)) {
       if (menuSwitch == 0) {
         PIDMotorLeft.proportion -= VARIATION_SPEED_PID;
@@ -343,6 +373,7 @@ void OLEDMenuOfMotorLeft(){
 
 void OLEDMenuOfGraphPID(){
   if(!KEY_Read(middle)){
+    time_delay_ms(100);
     if(!KEY_Read(middle)){
       menuSwitch++;
       LCD_CLS();
@@ -351,6 +382,7 @@ void OLEDMenuOfGraphPID(){
   menuSwitch = menuSwitch%NUMBER_OF_PID;
 
   if(!KEY_Read(up)){
+    time_delay_ms(100);
     if(!KEY_Read(up)){
       if(menuSwitch == 0){
         PIDServoOfGraph.proportion += VARIATION_GRAPH_PID;
@@ -363,6 +395,7 @@ void OLEDMenuOfGraphPID(){
       }
     }
   }else if(!KEY_Read(down)){
+    time_delay_ms(100);
     if(!KEY_Read(down)){
       if(menuSwitch == 0){
         PIDServoOfGraph.proportion -= VARIATION_GRAPH_PID;
@@ -409,8 +442,13 @@ void OLEDMenuOfGraphPID(){
 
 }
 
+
+/*
+ * 电磁PID调整
+ */
 void OLEDMenuOfElectromagnetismPID(){
   if(!KEY_Read(middle)){
+    time_delay_ms(100);
     if(!KEY_Read(middle)){
       menuSwitch++;
       LCD_CLS();
@@ -419,6 +457,7 @@ void OLEDMenuOfElectromagnetismPID(){
   menuSwitch = menuSwitch%NUMBER_OF_PID;
 
   if(!KEY_Read(up)){
+    time_delay_ms(100);
     if(!KEY_Read(up)){
       if(menuSwitch == 0){
         PIDServoOfElectromagnetism.proportion += VARIATION_Electromagnetism_PID;
@@ -431,6 +470,7 @@ void OLEDMenuOfElectromagnetismPID(){
       }
     }
   }else if(!KEY_Read(down)){
+    time_delay_ms(100);
     if(!KEY_Read(down)){
       if(menuSwitch == 0){
         PIDServoOfElectromagnetism.proportion -= VARIATION_Electromagnetism_PID;
@@ -466,7 +506,7 @@ void OLEDMenuOfElectromagnetismPID(){
   LCD_P8x16Str(80, 6, (u8*) txt);
 
 
-  LCD_P8x16Str(0,0,"Electromagnetism PID");
+  LCD_P8x16Str(0,0,"EM PID");
 
   if(menuSwitch == 3){
   LCD_P8x16Str(70,4,">");
@@ -478,6 +518,9 @@ void OLEDMenuOfElectromagnetismPID(){
 }
 
 
+/*
+ *
+ */
 void OLEDMenuOfGyro(){
 //  u16 tem=0;
 //  float fv=0.01;
@@ -512,7 +555,9 @@ void OLEDMenuOfGyro(){
 }
 
 
-
+/*
+ * 电感数据显示
+ */
 void OLEDMenuOfADCshow(){
 //  ADC0_Ch_e ADCRemawp[] = {ADC0_SE5a, ADC0_SE9, ADC0_DP1, ADC0_SE11, ADC0_DP3, ADC0_SE4a, ADC0_SE10, ADC0_DP2};
   ADC0_Ch_e ADCRemawp[] = {ADC0_DP1, ADC0_SE5a, ADC0_DP2, ADC0_DP3,  ADC0_SE11, ADC0_SE9, ADC0_SE4a, ADC0_SE10};
@@ -533,32 +578,53 @@ void OLEDMenuOfADCshow(){
 //  menuSwitch = menuSwitch % NUMBEROFADC;
 
 
-  if(!KEY_Read(up)){
-    if(!KEY_Read(up)){
-      menuSwitch += 1;
-    }
-  }else if(!KEY_Read(down)){
-    if(!KEY_Read(down)){
-      menuSwitch -= 1;
-      if(menuSwitch<0){
-        menuSwitch = NUMBER_OF_ADC;
-      }
-    }
-  }
+//  if(!KEY_Read(up)){
+//    time_delay_ms(100);
+//    if(!KEY_Read(up)){
+//      menuSwitch += 1;
+//    }
+//  }else if(!KEY_Read(down)){
+//    time_delay_ms(100);
+//    if(!KEY_Read(down)){
+//      menuSwitch -= 1;
+//      if(menuSwitch<0){
+//        menuSwitch = NUMBER_OF_ADC;
+//      }
+//    }
+//  }
 
   LCD_CLS();
 
-  sprintf(txt,"ADC%d:%d",(menuSwitch+0)%(NUMBER_OF_ADC),ADC0_Ave(ADCRemawp[(menuSwitch+0)%(NUMBER_OF_ADC)],ADC_16bit,10));  //2
+  sprintf(txt,"%d|",ADC0_Ave(L_0,ADC_16bit,10));  
   LCD_P8x16Str(0,0,(u8*)txt);
 
-  sprintf(txt,"ADC%d:%d",(menuSwitch+1)%(NUMBER_OF_ADC),ADC0_Ave(ADCRemawp[(menuSwitch+1)%(NUMBER_OF_ADC)],ADC_16bit,10)); //0
+  sprintf(txt,"%d|",ADC0_Ave(L_1,ADC_16bit,10));  
   LCD_P8x16Str(0,2,(u8*)txt);
-
-  sprintf(txt,"ADC%d:%d",(menuSwitch+2)%(NUMBER_OF_ADC),ADC0_Ave(ADCRemawp[(menuSwitch+2)%(NUMBER_OF_ADC)],ADC_16bit,10)); //7
+  
+  sprintf(txt,"%d|",ADC0_Ave(L_2,ADC_16bit,10));  
   LCD_P8x16Str(0,4,(u8*)txt);
 
-  sprintf(txt,"ADC%d:%d",(menuSwitch+3)%(NUMBER_OF_ADC),ADC0_Ave(ADCRemawp[(menuSwitch+3)%(NUMBER_OF_ADC)],ADC_16bit,10)); //4
+  sprintf(txt,"%d|",ADC0_Ave(L_3,ADC_16bit,10));  
   LCD_P8x16Str(0,6,(u8*)txt);
+
+  
+  sprintf(txt,"%d|",ADC0_Ave(L_4,ADC_16bit,10));  
+  LCD_P8x16Str(80,0,(u8*)txt);
+
+  
+  sprintf(txt,"%d|",ADC0_Ave(L_5,ADC_16bit,10));  
+  LCD_P8x16Str(80,2,(u8*)txt);
+
+  
+  sprintf(txt,"%d|",ADC0_Ave(L_6,ADC_16bit,10));  
+  LCD_P8x16Str(80,4,(u8*)txt);
+
+  
+  sprintf(txt,"%d|",ADC0_Ave(L_7,ADC_16bit,10));  
+  LCD_P8x16Str(80,6,(u8*)txt);
+
+
+
 
 
   time_delay_ms(10);

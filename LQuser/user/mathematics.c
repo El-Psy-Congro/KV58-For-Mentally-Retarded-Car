@@ -19,6 +19,4 @@ float Normalized(int value, int multiple, int min, int max){
   return (value-min)*multiple/(max-min);
 }
 
-void Convolution(kernel){
 
-}

@@ -59,6 +59,8 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
     #include "LQMPU6050.h"
     #include "LQ9AX.h"
 
+
+
     #include "PID.h"
     #include "menu.h"
     #include "simulationIIC.h"
@@ -66,6 +68,9 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
     #include "processing.h"
     #include "filter.h"
     #include "mathematics.h"
+    #include "MicroSD.h"
+    #include "fatfs.h"
+
 
 
 

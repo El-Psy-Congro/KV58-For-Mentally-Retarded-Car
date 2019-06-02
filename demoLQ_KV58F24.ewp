@@ -2247,7 +2247,25 @@
             <name>$PROJ_DIR$\LQuser\user\common.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\LQuser\user\diskio.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\diskio.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\fatfs.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\fatfs.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\ff_config.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\LQuser\user\include.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\integer.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\LQuser\user\L3G4200D.c</name>
@@ -2362,6 +2380,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\LQuser\user\LQWDOG.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\MicroSD.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\MicroSD.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\LQuser\user\simulationIIC.c</name>
