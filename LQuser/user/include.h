@@ -58,11 +58,15 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
     #include "LPTMR.h"   
     #include "LQMPU6050.h"
     #include "LQ9AX.h"
+
     #include "PID.h"
     #include "menu.h"
+    #include "simulationIIC.h"
+    #include "L3G4200D.h"
+    #include "processing.h"
+    #include "filter.h"
 
 
 
 
-
-#endif 
+#endif

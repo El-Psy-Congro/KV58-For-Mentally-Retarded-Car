@@ -29,10 +29,11 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 void LED_Init(void)
 {  
   //-----端口初始化----//
-  GPIO_Init(GPIOB,8,GPO,0);
-  GPIO_Init(GPIOB,9,GPO,0);
-  GPIO_Init(GPIOB,10,GPO,0);
-  GPIO_Init(GPIOB,11,GPO,0);  
+  GPIO_Init(GPIOB,8,GPO,1);
+  GPIO_Init(GPIOB,9,GPO,1);
+  GPIO_Init(GPIOB,10,GPO,1);
+  GPIO_Init(GPIOB,11,GPO,1);
+  GPIO_Init(GPIOA,27,GPO,1);
 }
 /*LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
 【作  者】CHIUSIR
@@ -50,24 +51,24 @@ void LED_Ctrl(LEDn_e ledno, LEDs_e sta)
   switch(ledno) 
   {
   case LED0:
-    if(sta==ON)        PTB8_OUT=0; //Turn on target LED1 
-    else if(sta==OFF) PTB8_OUT=1; //Turn off target LED1 
-    else if(sta==RVS) GPIO_Reverse (GPIOB, 8);//Toggle on target LED1
+    if(sta==ON)       PTB11_OUT=0; //Turn on target LED1
+    else if(sta==OFF) PTB11_OUT=1; //Turn off target LED1
+    else if(sta==RVS) GPIO_Reverse (GPIOB, 11);//Toggle on target LED1
     break;
   case LED1:
-    if(sta==ON)        PTB9_OUT=0; //Turn on target LED3 
-    else if(sta==OFF) PTB9_OUT=1; //Turn off target LED3 
-    else if(sta==RVS) GPIO_Reverse (GPIOB, 9);//Toggle on target LED3
+    if(sta==ON)       PTB10_OUT=0; //Turn on target LED3
+    else if(sta==OFF) PTB10_OUT=1; //Turn off target LED3
+    else if(sta==RVS) GPIO_Reverse (GPIOB, 10);//Toggle on target LED3
     break;   
   case LED3:
-    if(sta==ON)        PTB10_OUT=0; //Turn on target LED2 
-    else if(sta==OFF) PTB10_OUT=1; //Turn off target LED2 
-    else if(sta==RVS) GPIO_Reverse (GPIOB, 10);//Toggle on target LED2
+    if(sta==ON)        PTB9_OUT=0; //Turn on target LED2
+    else if(sta==OFF) PTB9_OUT=1; //Turn off target LED2
+    else if(sta==RVS) GPIO_Reverse (GPIOB, 9);//Toggle on target LED2
     break;    
   case LED2:
-    if(sta==ON)        PTB11_OUT=0; //Turn on target LED3 
-    else if(sta==OFF) PTB11_OUT=1; //Turn off target LED3 
-    else if(sta==RVS) GPIO_Reverse (GPIOB, 11);//Toggle on target LED3
+    if(sta==ON)        PTB8_OUT=0; //Turn on target LED3
+    else if(sta==OFF) PTB8_OUT=1; //Turn off target LED3
+    else if(sta==RVS) GPIO_Reverse (GPIOB, 8);//Toggle on target LED3
     break; 
   case LEDALL:
     if(sta==ON) 

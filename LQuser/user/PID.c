@@ -1,74 +1,155 @@
 #include "include.h"
 
-PID PIDServo, PIDMotorLeft, PIDMotorRight;
-short servo, speedLeft, speedRight;
-short SERVOMEDIAN = 1300, SPEEDLEFT, SPEEDRIGHT;
-void PidSet(){
-  PIDServo.SetPoint = 0;
-  PIDServo.Proportion = 0.27;
-  PIDServo.Integral = 0;
-  PIDServo.Derivative = 0;
+PID PIDServo, PIDMotorLeft, PIDMotorRight, PIDErect;
+int speedSet = 0;
 
-  PIDMotorLeft.SetPoint = 0;
-  PIDMotorLeft.Proportion = 0.001;
-  PIDMotorLeft.Integral = 0;
-  PIDMotorLeft.Derivative = 0;
+void PIDInit(){
+  PIDServo.setPoint = 0;
+  PIDServo.proportion = 0.007;  //0.27
+  PIDServo.integral = 0;
+  PIDServo.derivative = 0;
+  PIDServo.isDeviation = 0;
 
-  PIDMotorRight.SetPoint = 200;
-  PIDMotorRight.Proportion = 0.02;
-  PIDMotorRight.Integral = 0;
-  PIDMotorRight.Derivative = 0;
-}
+  PIDMotorLeft.setPoint = 200;
+  PIDMotorLeft.proportion = 0.090;
+  PIDMotorLeft.integral = 0.090;
+  PIDMotorLeft.derivative = 0;
+  PIDMotorLeft.isDeviation = 1;
 
-void ServoLocPIDCalc(int NextPoint){
-    int  iError,dError;
-    char txt[16];
-    
-    iError = PIDServo.SetPoint - NextPoint;       //偏差
-    PIDServo.SumError += iError;       //积分
-    dError = iError - PIDServo.LastError;     //微分
-    PIDServo.LastError = iError;
+  PIDMotorRight.setPoint = 200;
+  PIDMotorRight.proportion = 0.090;
+  PIDMotorRight.integral = 0.090;
+  PIDMotorRight.derivative = 0;
+  PIDMotorRight.isDeviation = 1;
 
-    servo = (int)(SERVOMEDIAN + PIDServo.Proportion * iError            //比例项
-//           + PIDServo.Integral * PIDServo.SumError   //积分项
-           + PIDServo.Derivative * dError
-           );
-    Servo_Duty(servo);
-//    sprintf(txt,"%04d",server);
-//    LCD_P6x8Str(40,1,(u8*)txt);
-
+  PIDErect.setPoint = 2700;
+  PIDErect.proportion =0.4;
+  PIDErect.integral = 0.000;
+  PIDErect.derivative = 0;
+  PIDErect.isDeviation = 0;
 }
 
 
-void MotorLeftLocPIDCalc(int NextPoint){
-    int  iError,dError;
-    char txt[16];
+//位置式PID
+int PositionalPID(int NextPoint, PID *aPID){
+  int  currentError,proportionVariable, integralVariable, derivativeVariable;
 
-    iError = PIDMotorLeft.SetPoint - NextPoint;       //偏差
-    PIDMotorLeft.SumError += iError;       //积分
-    dError = iError - PIDMotorLeft.LastError;     //微分
-    PIDMotorLeft.LastError = iError;
+  currentError = aPID->setPoint - NextPoint;
+  aPID->sumError += currentError;
 
-    speedLeft = (int)(PIDMotorLeft.SetPoint + PIDMotorLeft.Proportion * iError            //比例项
-           + PIDMotorLeft.Integral * PIDMotorLeft.SumError   //积分项
-           + PIDMotorLeft.Derivative * dError
-           );
-    Motor_Duty(MotL,speedLeft);
-    
+  proportionVariable = currentError;
+  integralVariable = aPID->sumError;
+  derivativeVariable = currentError - aPID->lastError;
+
+  aPID->prevError = aPID->lastError;
+  aPID->lastError = currentError;
+
+  if(aPID->isDeviation){
+    return (int)( aPID->proportion * proportionVariable
+                + aPID->integral * integralVariable
+                + aPID->derivative * derivativeVariable);
+  }else{
+    return (int)(aPID->setPoint
+               + aPID->proportion * proportionVariable
+               + aPID->integral * integralVariable
+               + aPID->derivative * derivativeVariable);
+  }
 }
 
-void MotorRightLocPIDCalc(int NextPoint){
-    int  iError,dError;
-    char txt[16];
+//增量式PID
+int IncrementalPID(int NextPoint, PID *aPID){
+  int  currentError, proportionVariable, integralVariable, derivativeVariable;
+  
+  currentError = aPID->setPoint - NextPoint;
 
-    iError = PIDMotorRight.SetPoint - NextPoint;       //偏差
-    PIDMotorRight.SumError += iError;       //积分
-    dError = iError - PIDMotorRight.LastError;     //微分
-    PIDMotorRight.LastError = iError;
+  proportionVariable = currentError - aPID->lastError;
+  integralVariable = currentError;
+  derivativeVariable = currentError - 2*aPID->lastError + aPID->prevError;
 
-    speedRight = (int)( PIDMotorRight.SetPoint + PIDMotorRight.Proportion * iError            //比例项
-           + PIDMotorRight.Integral * PIDMotorRight.SumError   //积分项
-           + PIDMotorRight.Derivative * dError
-           );
-    Motor_Duty(MotR,speedRight);
+  aPID->prevError = aPID->lastError;
+  aPID->lastError = currentError;
+  
+  
+  if(aPID->isDeviation){
+    return (int)( aPID->proportion * proportionVariable
+                + aPID->integral * integralVariable
+                + aPID->derivative * derivativeVariable);
+  }else{
+    return (int)(aPID->setPoint
+               + aPID->proportion * proportionVariable
+               + aPID->integral * integralVariable
+               + aPID->derivative * derivativeVariable);
+  }
 }
+
+
+
+//int PositionalPID(int NextPoint, PID aPID){
+//    int  iError,dError;
+//    char txt[16];
+//
+//    iError = aPID->SetPoint - NextPoint;       //偏差
+//    aPID->SumError += iError;       //积分
+//    dError = iError - aPID->LastError;     //微分
+//    aPID->LastError = iError;
+//
+//    return (int)(aPID->SetPoint + aPID->Proportion * iError            //比例项
+//           + aPID->Integral * aPID->SumError   //积分项
+//           + aPID->Derivative * dError
+//           );
+//}
+//
+//
+//void MotorLeftLocPIDCalc(int NextPoint){
+//    int  iError,dError;
+//    char txt[16];
+//
+//    iError = PIDMotorLeft.SetPoint - NextPoint;       //偏差
+//    PIDMotorLeft.SumError += iError;       //积分
+//    dError = iError - PIDMotorLeft.LastError;     //微分
+//    PIDMotorLeft.LastError = iError;
+//
+//    speedLeft = (int)(PIDMotorLeft.SetPoint + PIDMotorLeft.Proportion * iError            //比例项
+//           + PIDMotorLeft.Integral * PIDMotorLeft.SumError   //积分项
+//           + PIDMotorLeft.Derivative * dError
+//           );
+//    Motor_Duty(MotL,speedLeft);
+//
+//}
+//
+//void MotorRightLocPIDCalc(int NextPoint){
+//    int  iError,dError;
+//    char txt[16];
+//
+//    iError = PIDMotorRight.SetPoint - NextPoint;       //偏差
+//    PIDMotorRight.SumError += iError;       //积分
+//    dError = iError - PIDMotorRight.LastError;     //微分
+//    PIDMotorRight.LastError = iError;
+//
+//    speedRight = (int)( PIDMotorRight.SetPoint + PIDMotorRight.Proportion * iError            //比例项
+//           + PIDMotorRight.Integral * PIDMotorRight.SumError   //积分项
+//           + PIDMotorRight.Derivative * dError
+//           );
+//    Motor_Duty(MotR,speedRight);
+//}
+//
+//
+//void ErectLocPIDCalc(int NextPoint){
+//    int  iError,dError;
+//    char txt[16];
+//
+//    iError = PIDErect.SetPoint - NextPoint;       //偏差
+//    PIDErect.SumError += iError;       //积分
+//    dError = iError - PIDErect.LastError;     //微分
+//    PIDErect.LastError = iError;
+//
+//    angle = (int)(PIDErect.Proportion * iError            //比例项
+//           + PIDErect.Integral * PIDErect.SumError   //积分项
+//           + PIDErect.Derivative * dError
+//           );
+//
+//    PIDMotorLeft.SetPoint = angle;
+//    PIDMotorRight.SetPoint = angle;
+//}
+
+

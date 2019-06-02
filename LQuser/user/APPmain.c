@@ -137,36 +137,43 @@ KEY2            PTB22   //可中断触发
 
 void main(void)
 {   
-  PLL_Init(PLL235);         //设置内核及总线频率等
-  KEY_Init();               //按键及输入口初始化  
-  LED_Init();               //LED初始化
-  UART_Init(UART_4,115200); //串口初始化
-  MT9V034_Init();           //摄像头初始化
-  Servo_Init();             //舵机初始化
-  Motor_Init();            //电机初始化
-  PidSet();
-  FTM_AB_Init(FTM1);           //编码器初始化
-  FTM_AB_Init(FTM2);           //编码器初始化
-  PIT_Init(PIT0, 100);
+  PLL_Init(PLL235);             //设置内核及总线频率等
+  KEY_Init();                   //按键及输入口初始化
+  LED_Init();                   //LED初始化
+  LCD_Init();                   //LCD初始化
+  UART_Init(UART_4,115200);     //串口初始化
+  MT9V034_Init();               //摄像头初始化
+  Servo_Init();                 //舵机初始化
+  Motor_Init();                 //电机初始化
+  PIDInit();
+  Init_LQ_9AX();
+  FTM_AB_Init(FTM1);            //编码器初始化
+  FTM_AB_Init(FTM2);            //编码器初始化
+  PIT_Init(PIT1, 100);          //定时器1初始化
+  PIT_Init(PIT0, 100);          //定时器0初始化
+  MenuInit();                   //菜单初始化
+  ADC0_Init();                  //ADC初始化
 
- 
 
-  LCD_Init();               //LCD初始化
-  LCD_CLS();                //清屏	  
-//  LCD_Show_LQLogo();        //显示龙邱LOGO
-//  LCD_P14x16Str(0,0,"16"); //字符串显示 
+
+
+  LCD_CLS();                    //清屏
+//  LCD_Show_LQLogo();          //显示龙邱LOGO
+  LCD_P14x16Str(0,0,"16");    //字符串显示
   
 
  
-  time_delay_ms(500);       //延时  
+//  time_delay_ms(500);           //延时
+  
   
 //#ifdef __USE_TFT18
-//  TFTSPI_CLS(u16BLACK);     //蓝色屏幕	 
+//  TFTSPI_CLS(u16BLACK);       //蓝色屏幕
 //#else    
-//  LCD_CLS();                //清屏	
+//  LCD_CLS();                 //清屏
 //#endif  
-  time_delay_ms(50);        //延时  
-  EnableInterrupts
+  Servo_Duty(servoMedian);
+  time_delay_ms(5);        //延时
+  EnableInterrupts          //中断使能
   LED_Ctrl(LEDALL, OFF);   
   //-----------------------------------------------------------------------------------------  
   //  测试函数都是死循环，每次只能开启一个
@@ -191,9 +198,15 @@ void main(void)
  // Test_OLED();  
   //-----------------------------------------------------------------------------------------
  // LCD_Show_LQLogo();
-  while(1){  
-    ServoLocPIDCalc(MT9V034());
-    menu();
+
+  while(1){
+//    BEE_OFF;
+//    VirtualOscilloscopeData[0] = ReadGyro();
+//    VirtualOscilloscope(VirtualOscilloscopeData);
+//    GyroAngleProcessing();
+    Menu();
+
+    
   }
 } 
 

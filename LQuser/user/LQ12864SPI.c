@@ -807,13 +807,13 @@ void Test_OLED(void)
     while (1)
     {  
       //²âÊÔ°´¼ü      
-      if(KEY_Read(Up)==0)
+      if(KEY_Read(up)==0)
         LCD_P6x8Str(13,3,(uint8_t*)"KEY0 Pressed!   ");
       else LCD_P6x8Str(13,3,(uint8_t*)"KEY0 NO Pressed!");
-      if(KEY_Read(Down)==0)
+      if(KEY_Read(down)==0)
         LCD_P6x8Str(13,5,(uint8_t*)"KEY1 Pressed!   ");
       else LCD_P6x8Str(13,5,(uint8_t*)"KEY1 NO Pressed!");
-      if(KEY_Read(Middle)==0)
+      if(KEY_Read(middle)==0)
         LCD_P6x8Str(13,7,(uint8_t*)"KEY2 Pressed!   ");
       else LCD_P6x8Str(13,7,(uint8_t*)"KEY2 NO Pressed!");
       

@@ -73,7 +73,7 @@ int MT9V034(void)
               
     Threshold = GetOSTU(Image_Data); //OSTU大津法 获取全局阈值
     BinaryImage(Image_Data,Threshold); //二值化图像数据
-      
+
     Seek_Road();
 //    Draw_Road();        //龙邱OLED模块显示动态图像
     Field_Over_Flag= 0;
@@ -91,7 +91,6 @@ int MT9V034(void)
 void MT9V034_Init(void)
 {       
   uint16_t data = 0; 
-  
   //GPIO口初始化
   EXTI_Init(GPIOD,13,rising_down);   //行中断
   EXTI_Init(GPIOD,14,falling_up);    //场中断  
@@ -111,9 +110,17 @@ void MT9V034_Init(void)
   if(SCCB_RegRead(MT9V034_I2C_ADDR>>1,MT9V034_CHIP_VERSION,&data) == 0)//读取摄像头版本寄存器 
   {     
     if(data != MT9V034_CHIP_ID)                                  //芯片ID不正确，说明没有正确读取导数据，等待      
-    { 
-      LCD_P6x8Str(2,1,(u8*)"V034 NG");                      //摄像头识别失败，停止运行
-      while(1); 
+    {                      //摄像头识别失败，停止运行
+      while(1){
+        LCD_P6x8Str(0,0,"Camera Initialization Failed");
+        LCD_P6x8Str(0,2,"Please long press the middle key to unlock");
+        if(!KEY_Read(middle)){
+          time_delay_ms(1700);
+          if(!KEY_Read(middle)){
+            break;
+          }
+        }
+      }
     } 
     else                                                   //芯片ID正确
     {
@@ -122,7 +129,16 @@ void MT9V034_Init(void)
   } 
   else 
   { 
-    while(1); //摄像头识别失败，停止运行
+    while(1){
+      LCD_P6x8Str(0,0,"Camera Initialization Failed");
+      LCD_P6x8Str(0,2,"Please long press the middle key to unlock");
+      if(!KEY_Read(middle)){
+        time_delay_ms(1700);
+        if(!KEY_Read(middle)){
+          break;
+        }
+      }
+    } //摄像头识别失败，停止运行
   }  
 
 

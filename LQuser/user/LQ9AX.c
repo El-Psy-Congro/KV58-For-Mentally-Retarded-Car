@@ -189,6 +189,22 @@ void Update9AX(void)
   //time_delay_ms(100);
 }
 
+int ReadGyro(){
+  int tem=0;
+  Update9AX();
+  if(ACC_Y.MYBYTE.BYTEH > 0x7F){
+    tem= (~(ACC_Y.MYWORD>>2) + 1)&0X3FFF;
+  }else{
+    tem=(ACC_Y.MYWORD>>2)&0X3FFF;
+  }
+
+  if(tem > 4000){
+    return 4000;
+  }
+
+  return tem;
+}
+
 void Cvt_14bit_Str(char str[],LQ9AXt V2)
 {
   char characters[17]="0123456789ABCDEF";   

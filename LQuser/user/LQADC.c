@@ -136,19 +136,20 @@ void Test_ADC0(void)
   //UART_Init(UART_4,115200);
   //UART_Put_Str(UART_4,"LongQiu UART4 ADC \n");
   //UARTIrq_En(UART0);
-  LCD_CLS();                   //LCD清屏
+//  LCD_CLS();                   //LCD清屏
   LCD_P8x16Str(4,0,(uint8_t*)"LQ ADC Test Bat");  
   ADC0_Init();             //电源低压报警ADC初始化
   while (1)
   {           
-    //测试ADC转换                                     //电池电压采集
-    batv0=ADC0_Ave(ADC0_SE8,ADC_12bit,10)*22/91; //330/4095*3,PTA7 
+    //测试ADC转换  
+    LCD_CLS();                                  //电池电压采集
+    batv0=ADC0_Once(ADC0_SE5a,ADC_12bit); //330/4095*3,PTA7 
 
     //if(batv<700)                                    //低于7V，OLED提示电压
     {
-      sprintf(txt,"BAT0:%d.%dV ",batv0/100,batv0%100);// *3.3/4095*3
+      sprintf(txt,"BAT0:%d",batv0);// *3.3/4095*3
       LCD_P8x16Str(20,3,(u8*)txt);
-      time_delay_ms(500);
+      time_delay_ms(10);
 
     }  
     //UART_Put_Str(UART_4,(u8*)txt);        
@@ -157,6 +158,6 @@ void Test_ADC0(void)
     //LED_Ctrl(LED1, RVS);     
     
     //systick中断延时
-    time_delay_ms(100);
+    time_delay_ms(10);
   }
 }

@@ -762,7 +762,7 @@ void ServoFTM_PWM_Init(FTM_Type * ftmn, FTM_CHn_e ch, u16 mod, u16 cv)
 
     /******************** 配置时钟和分频 ********************/
     FTM_SC_REG(ftmn)    = ( 0
-                                  | FTM_SC_PS(7)      //分频2^FTM_SC_PS,频率为 275M/2/2^7
+                                  | FTM_SC_PS(5)      //分频2^FTM_SC_PS,频率为 275M/2/2^7
                                   | FTM_SC_CLKS(1)    //时钟选择，bus时钟
                           );                          //PMW频率=X系统频率/2/(2^FTM1_SC_PS)/FTM1_MOD
     FTM_MOD_REG(ftmn)   = mod;                        //模数, EPWM的周期为 ：MOD - CNTIN + 0x0001
@@ -1518,8 +1518,8 @@ void Servo_Init(void)
 {
    //舵机频率：275M/2/(2^7)/21484.375=50HZ,FTM3硬件报错
    //舵机频率：275M/2/(2^7)/20000=54HZ,FTM3硬件报错
-   ServoFTM_PWM_Init(FTM3,FTM_CH7,20000,Servo_Middle);//Mot11-PTC11    舵机方向左边大右边小
-   ServoFTM_PWM_Init(FTM3,FTM_CH6,20000,Servo_Middle);
+   ServoFTM_PWM_Init(FTM3,FTM_CH7,40000,Servo_Middle);//Mot11-PTC11    舵机方向左边大右边小
+   ServoFTM_PWM_Init(FTM3,FTM_CH6,40000,Servo_Middle);
 }
 /*LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
 【作  者】CHIUSIR
@@ -1561,11 +1561,11 @@ void Motor_Duty(u16 Motno, int duty)
   switch(Motno){
   case MotR:
     if(duty > 0){
-      FTM_CnV_REG(FTM0, FTM_CH0) = duty;  //电机
-      FTM_CnV_REG(FTM0, FTM_CH1) = 0;
-    }else{
-      FTM_CnV_REG(FTM0, FTM_CH1) = -duty;  //电机
       FTM_CnV_REG(FTM0, FTM_CH0) = 0;  //电机
+      FTM_CnV_REG(FTM0, FTM_CH1) = duty;
+    }else{
+      FTM_CnV_REG(FTM0, FTM_CH1) = 0;  //电机
+      FTM_CnV_REG(FTM0, FTM_CH0) = -duty;  //电机
     }
     break;
 
@@ -1633,19 +1633,19 @@ void Test_Servo(void)
   while (1)
   {    
     
-    if(!KEY_Read(Down))  
+    if(!KEY_Read(down))  
     {
       //if(servopwm>Servo_Left-9) 
         servopwm-=10;
       Servo_Duty(servopwm);//刷新servopwm频率
     }
-    else if(!KEY_Read(Up))  
+    else if(!KEY_Read(up))  
     {
       //if(servopwm<Servo_Right-9) 
         servopwm+=10;
       Servo_Duty(servopwm);//刷新servopwm频率
     }
-    else if(!KEY_Read(Middle))  
+    else if(!KEY_Read(middle))  
     {
       servopwm=Servo_Middle;
       Servo_Duty(servopwm);//刷新servopwm频率
@@ -1694,19 +1694,19 @@ void Test_Motor(void)
   
   while (1)
   {        
-    if(!KEY_Read(Down))  
+    if(!KEY_Read(down))  
     {
       //if(motorpwm>99) 
         motorpwm-=10;
       Motor_Duty(Mot1,motorpwm);//刷新servopwm频率
     }
-    else if(!KEY_Read(Up))  
+    else if(!KEY_Read(up))  
     {
       //if(motorpwm<12000) 
         motorpwm+=10;
       Motor_Duty(Mot1,motorpwm);//刷新servopwm频率
     }
-    else if(!KEY_Read(Middle))  
+    else if(!KEY_Read(middle))  
     {
       motorpwm=500;
       Motor_Duty(Mot1,motorpwm);//刷新servopwm频率

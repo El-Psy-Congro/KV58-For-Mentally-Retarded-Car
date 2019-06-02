@@ -19,6 +19,9 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 
 #include "include.h"
 
+#define BEE_ON PTA27_OUT=0
+#define BEE_OFF PTA27_OUT=1
+
 /*******************************************************************************
 * Definitions
 ******************************************************************************/
