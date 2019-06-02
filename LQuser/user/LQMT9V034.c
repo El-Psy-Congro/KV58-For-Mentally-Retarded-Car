@@ -367,7 +367,7 @@ __ramfunc void GetUseImage(void)
 {
   int i = 0,j = 0,row = 0,line = 0;
   
-  for(i = 0; i  < IMAGEH; i+=2)  //120行，每2行采集一行，
+  for(i = 0; i  < IMAGEH; i+=1)  //120行，每2行采集一行，
   {
     for(j = 0;j < IMAGEW; j+=2)  //188，
     {        

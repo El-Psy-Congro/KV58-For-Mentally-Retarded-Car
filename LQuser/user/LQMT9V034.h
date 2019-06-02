@@ -18,7 +18,7 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 #define __LQ_MT9V034_H_
 #include "include.h"
 
-#define IMAGEH  120  //行 HEIGHT 待采集摄像头图像高度行数
+#define IMAGEH  60  //行 HEIGHT 待采集摄像头图像高度行数
 #define IMAGEW  188  //列 WIDTH  待采集摄像头图像宽度列数
 
 #define GRAPH_HIGHT    60  //OLED显示的行数

@@ -64,8 +64,9 @@ void PIT0_IRQHandler(){
   LED_Ctrl(LED0, RVS);        //中断发生后LED闪烁
   speedLeftGet = FTM_AB_Get(FTM1);
   speedRightGet = -FTM_AB_Get(FTM2);
-  Motor_Duty(MotL, PositionalPID(speedLeftGet,  &PIDMotorLeft));
-  Motor_Duty(MotR, PositionalPID(speedRightGet, &PIDMotorRight));
+  Motor_Duty(MotL, PIDPositional(speedLeftGet,  &PIDMotorLeft));
+  Motor_Duty(MotR, PIDPositional(speedRightGet, &PIDMotorRight));
+  Servo_Duty(servo);
 //  speed=FTM_AB_Get(FTM2);     //开启正交解码后，可以获取速度，正负表示方向
 }
 
@@ -74,13 +75,16 @@ void PIT1_IRQHandler(){
   LED_Ctrl(LED1, RVS);        //中断发生后LED闪烁
   /*用户添加所需代码*/
   DataFusion();
-  Servo_Duty(LimitingAmplitude(servo, 4700, 5800));
+
 }
 
 void PIT2_IRQHandler(){
   PIT_Flag_Clear(PIT2);       //清中断标志位
-  LED_Ctrl(LED3, RVS);
-  GyroAngleProcessing();
+//  LED_Ctrl(LED3, RVS);
+//  GyroAngleProcessing();
+  isIslandLeft = false;
+  isIslandRight = false;
+  BEE_OFF;
 
 
   /*用户添加所需代码*/

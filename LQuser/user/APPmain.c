@@ -153,10 +153,12 @@ void main(void)
   FTM_AB_Init(FTM2);            //编码器初始化
   MenuInit();                   //菜单初始化
   ADC0_Init();                  //ADC初始化
-  PIT_Init(PIT0, 10);           //定时器0初始化
-  PIT_Init(PIT1, 30);           //定时器1初始化
-//  PIT_Init(PIT2, 5);            //定时器2初始化
-  PIT_Init(PIT3, 70);            //定时器2初始化
+
+
+  PIT_Init(PIT0, 10);           //定时器0初始化       舵机与电机的控制
+  PIT_Init(PIT1, 30);           //定时器1初始化       数据的处理
+  PIT_Init(PIT2, 1000);            //定时器2初始化     陀螺仪数据的处理
+  PIT_Init(PIT3, 100);          //定时器2初始化     菜单的显示
 //  GyroInit();
 
 
@@ -179,7 +181,7 @@ void main(void)
 //  LCD_CLS();                 //清屏
 //#endif  
   Servo_Duty(servoMedian);
-  time_delay_ms(5);        //延时
+  time_delay_ms(100);        //延时
   EnableInterrupts          //中断使能
   LED_Ctrl(LEDALL, OFF);
 //  -----------------------------------------------------------------------------------------
@@ -206,6 +208,7 @@ void main(void)
 //  -----------------------------------------------------------------------------------------
 //  LCD_Show_LQLogo();
 
+
   while(1){
 //    BEE_OFF;
 
@@ -215,8 +218,18 @@ void main(void)
 //    Menu();
 
 //    ReadGyro();
-
-    LED_Ctrl(LED2, RVS);
+//    GetUseImage();
+//    LED_Ctrl(LED2, RVS);
+//    GraphProcessingOfCannyEdgeDetection();
+//    UART_Put_Char(UART_4, 0x00);
+//    UART_Put_Char(UART_4, 0xFF);
+//    UART_Put_Char(UART_4, 0x01);
+//    UART_Put_Char(UART_4, 0x00);
+//    for(int i = 0; i < GRAPH_HIGHT - 1; i++){
+//      for(int j = 0; j < GRAPH_WIDTH - 1; j++){
+//        UART_Put_Char(UART_4, Image_Use[i][j]);
+//      }
+//    }
 
 
     
