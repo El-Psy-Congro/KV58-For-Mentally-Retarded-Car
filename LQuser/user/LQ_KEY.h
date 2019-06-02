@@ -25,11 +25,11 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 //¶¨ÒåÄ£¿éºÅ
 typedef enum
 {
-    Down=0,
+    down=0,
     left=1,
-    Middle=2, 
+    middle=2, 
     right=3, 
-    Up=4, 
+    up=4, 
 } KEYn_e;
 typedef enum
 {

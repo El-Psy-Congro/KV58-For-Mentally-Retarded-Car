@@ -51,7 +51,7 @@
         <CHIPMODE>_ "NXP_KVx_KV58F1M0M24"</CHIPMODE>
     </PE_DEVICE>
     <DebugChecksum>
-        <Checksum>3103770005</Checksum>
+        <Checksum>1199380376</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -315,8 +315,9 @@
     </DisassembleMode>
     <Breakpoints2>
         <Bp0>_ 0 "EMUL_DATA" "UART_Put_Buff" 0 0 0 0 4294967295</Bp0>
-        <Bp1>_ 0 "EMUL_CODE" "{$PROJ_DIR$\LQuser\user\LQMT9V034.c}.993.3" 0 0 1 "" 0 "" 0</Bp1>
-        <Count>2</Count>
+        <Bp1>_ 0 "EMUL_CODE" "{$PROJ_DIR$\LQuser\user\LQMPUIIC.c}.21.1" 0 0 1 "" 0 "" 0</Bp1>
+        <Bp2>_ 0 "EMUL_CODE" "{$PROJ_DIR$\LQuser\user\MPU6050.c}.24.1" 0 0 1 "" 0 "" 0</Bp2>
+        <Count>3</Count>
     </Breakpoints2>
     <Aliases>
         <Count>0</Count>

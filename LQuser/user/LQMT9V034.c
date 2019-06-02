@@ -16,12 +16,12 @@
 QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 #include "include.h"
 
-u8 Image_Data[IMAGEH][IMAGEW];      //图像原始数据存放
-volatile u8 Image_Use[LCDH][LCDW]; //压缩后之后用于存放屏幕显示数据
-u16 Pixle[LCDH][LCDW];              //二值化后用于OLED显示的数据
-uint8_t Threshold;                  //OSTU大津法计算的图像阈值
+u8 imageData[IMAGEH][IMAGEW];      //图像原始数据存放
+volatile u8 Image_Use[GRAPH_HIGHT][GRAPH_WIDTH]; //压缩后之后用于存放屏幕显示数据
+u16 graph[GRAPH_HIGHT][GRAPH_WIDTH];              //二值化后用于OLED显示的数据
+uint8_t threshold;                  //OSTU大津法计算的图像阈值
 volatile u8  Line_Cont=0;          //行计数
-volatile u8  Field_Over_Flag=0;    //场标识
+volatile u8  fieldOverFlag=0;    //场标识
 
 int OFFSET0=0;      //最远处，赛道中心值综合偏移量
 int OFFSET1=0;      //第二格
@@ -43,7 +43,7 @@ void PORTD_IRQHandler(void)
       Line_Cont=0; 
       return ;
     }
-    DMATransDataStart(DMA_CH4,(uint32_t)(&Image_Data[Line_Cont][0]),IMAGEW); //DMA开始传输数据PTD12管脚触发
+    DMATransDataStart(DMA_CH4,(uint32_t)(&imageData[Line_Cont][0]),IMAGEW); //DMA开始传输数据PTD12管脚触发
     ++Line_Cont;            //行计数
     return ;
   }
@@ -53,7 +53,7 @@ void PORTD_IRQHandler(void)
     PORTD_ISFR |= 0x4000;  //清除中断标识    
     // 用户程序 
     Line_Cont = 0;         //行计数清零
-    Field_Over_Flag=1;     //场结束标识
+    fieldOverFlag=1;     //场结束标识
     return ;
   }   
 } 
@@ -66,18 +66,19 @@ int MT9V034(void)
   //LCD_Show_Frame100();    //画图像 LCDW*LCDH 外框
   
   LED_Ctrl(LED1, RVS);  //LED指示程序运行状态
-  if(Field_Over_Flag)   //完成一场图像采集后显示并发送数据到上位机
+  if(fieldOverFlag)   //完成一场图像采集后显示并发送数据到上位机
   {
-    Get_Use_Image();    //采集图像数据存放数组
-    Get_01_Value();     //二值化图像数据
-              
-    Threshold = GetOSTU(Image_Data); //OSTU大津法 获取全局阈值
-    BinaryImage(Image_Data,Threshold); //二值化图像数据
-      
-    Seek_Road();
+
+    GetUseImage();    //采集图像数据存放数组
+    threshold = GetOSTU(imageData); //OSTU大津法 获取全局阈值
+    GetBinarizationValue();     //二值化图像数据
+    SeekRoad();
+
+
+
 //    Draw_Road();        //龙邱OLED模块显示动态图像
-    Field_Over_Flag= 0;
-    
+    fieldOverFlag= 0;
+
     //串口发送数据非常慢，注释掉OLED刷新很快
     //  UARTSendPicture(Image_Data);//发送数据到上位机，注意协议格式，不同的上位机看原函数对应修改
     //EnableInterrupts
@@ -91,7 +92,6 @@ int MT9V034(void)
 void MT9V034_Init(void)
 {       
   uint16_t data = 0; 
-  
   //GPIO口初始化
   EXTI_Init(GPIOD,13,rising_down);   //行中断
   EXTI_Init(GPIOD,14,falling_up);    //场中断  
@@ -111,9 +111,17 @@ void MT9V034_Init(void)
   if(SCCB_RegRead(MT9V034_I2C_ADDR>>1,MT9V034_CHIP_VERSION,&data) == 0)//读取摄像头版本寄存器 
   {     
     if(data != MT9V034_CHIP_ID)                                  //芯片ID不正确，说明没有正确读取导数据，等待      
-    { 
-      LCD_P6x8Str(2,1,(u8*)"V034 NG");                      //摄像头识别失败，停止运行
-      while(1); 
+    {                      //摄像头识别失败，停止运行
+      while(1){
+        LCD_P6x8Str(0,0,"Camera Initialization Failed");
+        LCD_P6x8Str(0,2,"Please long press the middle key to unlock");
+        if(!KEY_Read(middle)){
+          time_delay_ms(1700);
+          if(!KEY_Read(middle)){
+            break;
+          }
+        }
+      }
     } 
     else                                                   //芯片ID正确
     {
@@ -122,7 +130,16 @@ void MT9V034_Init(void)
   } 
   else 
   { 
-    while(1); //摄像头识别失败，停止运行
+    while(1){
+      LCD_P6x8Str(0,0,"Camera Initialization Failed");
+      LCD_P6x8Str(0,2,"Please long press the middle key to unlock");
+      if(!KEY_Read(middle)){
+        time_delay_ms(1700);
+        if(!KEY_Read(middle)){
+          break;
+        }
+      }
+    } //摄像头识别失败，停止运行
   }  
 
 
@@ -180,7 +197,7 @@ void MT9V034_Init(void)
 
   SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_RESET, 0x03);          //0x0c  复位
   
-  DMATransDataInit(DMA_CH4,(void*)&PTD_BYTE0_IN,(void*)Image_Data,PTD12,DMA_BYTE1,IMAGEW,DMA_rising_down);//初始化DMA采集  
+  DMATransDataInit(DMA_CH4,(void*)&PTD_BYTE0_IN,(void*)imageData,PTD12,DMA_BYTE1,IMAGEW,DMA_rising_down);//初始化DMA采集  
 
 }
 void MT9V034_SetFrameResolution(uint16_t height,uint16_t width)
@@ -346,7 +363,7 @@ __ramfunc void DMATransDataStart(uint8_t CHn,uint32_t address,uint32_t Val)
 } 
 
 // 获取需要的图像数据
-__ramfunc void Get_Use_Image(void)
+__ramfunc void GetUseImage(void)
 {
   int i = 0,j = 0,row = 0,line = 0;
   
@@ -354,7 +371,7 @@ __ramfunc void Get_Use_Image(void)
   {
     for(j = 0;j < IMAGEW; j+=2)  //188，
     {        
-      Image_Use[row][line] = Image_Data[i][j];         
+      Image_Use[row][line] = imageData[i][j];         
       line++;        
     }      
     line = 0;
@@ -363,7 +380,7 @@ __ramfunc void Get_Use_Image(void)
 }
 
 //按照均值的比例进行二值化
-void Get_01_Value(void)
+void GetBinarizationValue(void)
 {
   int i = 0,j = 0;
   u8 GaveValue;
@@ -371,27 +388,27 @@ void Get_01_Value(void)
   char txt[16];
   
   //累加
-  for(i = 0; i <LCDH; i++)
+  for(i = 0; i <GRAPH_HIGHT; i++)
   {    
-    for(j = 0; j <LCDW; j++)
+    for(j = 0; j <GRAPH_WIDTH; j++)
     {                            
       tv+=Image_Use[i][j];   //累加  
     } 
   }
-  GaveValue=tv/LCDH/LCDW;     //求平均值,光线越暗越小，全黑约35，对着屏幕约160，一般情况下大约100 
+  GaveValue=tv/GRAPH_HIGHT/GRAPH_WIDTH;     //求平均值,光线越暗越小，全黑约35，对着屏幕约160，一般情况下大约100 
 //  sprintf(txt,"%03d:%03d",Threshold,GaveValue);//前者为大津法求得的阈值，后者为平均值  
 //  LCD_P6x8Str(80,1,(u8*)txt);
   //按照均值的比例进行二值化
   GaveValue=GaveValue*7/10+10;        //此处阈值设置，根据环境的光线来设定 
-  for(i = 0; i < LCDH; i++)
+  for(i = 0; i < GRAPH_HIGHT; i++)
   {
-    for(j = 0; j < LCDW; j++)
+    for(j = 0; j < GRAPH_WIDTH; j++)
     {                                
       //if(Image_Use[i][j] >GaveValue)//平均值阈值
-      if(Image_Use[i][j] >Threshold) //大津法阈值   数值越大，显示的内容越多，较浅的图像也能显示出来    
-        Pixle[i][j] =1;        
+      if(Image_Use[i][j] >threshold) //大津法阈值   数值越大，显示的内容越多，较浅的图像也能显示出来    
+        graph[i][j] =1;        
       else                                        
-        Pixle[i][j] =0;
+        graph[i][j] =0;
     }    
   }
 }
@@ -404,38 +421,40 @@ void Draw_Road(void)
   for(i=8;i<56;i+=8)//6*8=48行 
   {
     LCD_Set_Pos(18,i/8+1);//起始位置
-    for(j=0;j<LCDW;j++)  //列数
+    for(j=0;j<GRAPH_WIDTH;j++)  //列数
     { 
       temp=0;
-      if(Pixle[0+i][j]) temp|=1;
-      if(Pixle[1+i][j]) temp|=2;
-      if(Pixle[2+i][j]) temp|=4;
-      if(Pixle[3+i][j]) temp|=8;
-      if(Pixle[4+i][j]) temp|=0x10;
-      if(Pixle[5+i][j]) temp|=0x20;
-      if(Pixle[6+i][j]) temp|=0x40;
-      if(Pixle[7+i][j]) temp|=0x80;
+      if(graph[0+i][j]) temp|=1;
+      if(graph[1+i][j]) temp|=2;
+      if(graph[2+i][j]) temp|=4;
+      if(graph[3+i][j]) temp|=8;
+      if(graph[4+i][j]) temp|=0x10;
+      if(graph[5+i][j]) temp|=0x20;
+      if(graph[6+i][j]) temp|=0x40;
+      if(graph[7+i][j]) temp|=0x80;
       LCD_WrDat(temp); 	  	  	  	  
     }
   }  
 }
+
+
 //三面以上反数围绕清除噪点
 void Pixle_Filter(void)
 {  
   int nr; //行
   int nc; //列
   
-  for(nr=1; nr<LCDH-1; nr++)
+  for(nr=1; nr<GRAPH_HIGHT-1; nr++)
   {  	    
-    for(nc=1; nc<LCDW-1; nc=nc+1)
+    for(nc=1; nc<GRAPH_WIDTH-1; nc=nc+1)
     {
-      if((Pixle[nr][nc]==0)&&(Pixle[nr-1][nc]+Pixle[nr+1][nc]+Pixle[nr][nc+1]+Pixle[nr][nc-1]>2))         
+      if((graph[nr][nc]==0)&&(graph[nr-1][nc]+graph[nr+1][nc]+graph[nr][nc+1]+graph[nr][nc-1]>2))         
       {
-        Pixle[nr][nc]=1;
+        graph[nr][nc]=1;
       }	
-      else if((Pixle[nr][nc]==1)&&(Pixle[nr-1][nc]+Pixle[nr+1][nc]+Pixle[nr][nc+1]+Pixle[nr][nc-1]<2))         
+      else if((graph[nr][nc]==1)&&(graph[nr-1][nc]+graph[nr+1][nc]+graph[nr][nc+1]+graph[nr][nc-1]<2))         
       {
-        Pixle[nr][nc]=0;
+        graph[nr][nc]=0;
       }	
     }	  
   }  
@@ -453,7 +472,7 @@ void Pixle_Filter(void)
 *            如果面积为负数，数值越大说明越偏左边；                        *
 *            如果面积为正数，数值越大说明越偏右边。                        *
 ***************************************************************************/ 
-void Seek_Road(void)
+void SeekRoad(void)
 {  
   int nr; //行
   int nc; //列
@@ -464,14 +483,14 @@ void Seek_Road(void)
   {  	    
     for(nc=MAX_COL/2;nc<MAX_COL;nc=nc+1)
     {
-      if(Pixle[nr][nc])
+      if(graph[nr][nc])
       {
         ++temp;
       }			   
     }
     for(nc=0; nc<MAX_COL/2; nc=nc+1)
     {
-      if(Pixle[nr][nc])
+      if(graph[nr][nc])
       {
         --temp;
       }			   
@@ -483,14 +502,14 @@ void Seek_Road(void)
   {  	    
     for(nc=MAX_COL/2;nc<MAX_COL;nc=nc+1)
     {
-      if(Pixle[nr][nc])
+      if(graph[nr][nc])
       {
         ++temp;
       }			   
     }
     for(nc=0; nc<MAX_COL/2; nc=nc+1)
     {
-      if(Pixle[nr][nc])
+      if(graph[nr][nc])
       {
         --temp;
       }			   
@@ -502,14 +521,14 @@ void Seek_Road(void)
   {  	    
     for(nc=MAX_COL/2;nc<MAX_COL;nc=nc+1)
     {
-      if(Pixle[nr][nc])
+      if(graph[nr][nc])
       {
         ++temp;
       }			   
     }
     for(nc=0; nc<MAX_COL/2; nc=nc+1)
     {
-      if(Pixle[nr][nc])
+      if(graph[nr][nc])
       {
         --temp;
       }			   
@@ -534,11 +553,11 @@ void FindTiXing(void)
   {  	    
     for(nc=2;nc<MAX_COL-2;nc++)
     {
-      if((Pixle[nr+8][nc-1]==0)&&(Pixle[nr+8][nc]==0)&&(Pixle[nr+8][nc+1]==1)&&(Pixle[nr+8][nc+2]==1))
+      if((graph[nr+8][nc-1]==0)&&(graph[nr+8][nc]==0)&&(graph[nr+8][nc+1]==1)&&(graph[nr+8][nc+2]==1))
       {
         zb[nr]=nc;//左边沿，越来越大
       }
-      if((Pixle[nr+8][nc-1]==1)&&(Pixle[nr+8][nc]==1)&&(Pixle[nr+8][nc+1]==0)&&(Pixle[nr+8][nc+2]==0))
+      if((graph[nr+8][nc-1]==1)&&(graph[nr+8][nc]==1)&&(graph[nr+8][nc+1]==0)&&(graph[nr+8][nc+2]==0))
       {
         yb[nr]=nc;//右边沿，越来越小
       }                   
@@ -918,8 +937,8 @@ uint8_t GetOSTU(uint8_t tmImage[IMAGEH][IMAGEW])
   int32_t PixelFore = 0; 
   double OmegaBack, OmegaFore, MicroBack, MicroFore, SigmaB, Sigma; // 类间方差; 
   int16_t MinValue, MaxValue; 
-  uint8_t Threshold = 0;
   uint8_t HistoGram[256];              //  
+  threshold = 0;
 
   for (j = 0; j < 256; j++)  HistoGram[j] = 0; //初始化灰度直方图 
   
@@ -959,10 +978,10 @@ uint8_t GetOSTU(uint8_t tmImage[IMAGEH][IMAGEW])
     if (Sigma > SigmaB)                    //遍历最大的类间方差g //找出最大类间方差以及对应的阈值
     {
       SigmaB = Sigma;
-      Threshold = j;
+      threshold = j;
     }
   }
-  return Threshold;                        //返回最佳阈值;
+  return threshold;                        //返回最佳阈值;
 } 
 /*************************************************************** 
 * 

@@ -137,63 +137,89 @@ KEY2            PTB22   //可中断触发
 
 void main(void)
 {   
-  PLL_Init(PLL235);         //设置内核及总线频率等
-  KEY_Init();               //按键及输入口初始化  
-  LED_Init();               //LED初始化
-  UART_Init(UART_4,115200); //串口初始化
-  MT9V034_Init();           //摄像头初始化
-  Servo_Init();             //舵机初始化
-  Motor_Init();            //电机初始化
-  PidSet();
-  FTM_AB_Init(FTM1);           //编码器初始化
-  FTM_AB_Init(FTM2);           //编码器初始化
-  PIT_Init(PIT0, 100);
+  PLL_Init(PLL235);             //设置内核及总线频率等
+  KEY_Init();                   //按键及输入口初始化
+  LED_Init();                   //LED初始化
+  LCD_Init();                   //LCD初始化
+//  TFTSPI_Init();                //TFT1.8吋SPI彩屏初始化
+  UART_Init(UART_4,115200);     //串口初始化
+  MT9V034_Init();               //摄像头初始化
+  Servo_Init();                 //舵机初始化
+  Motor_Init();                 //电机初始化
+  PIDInit();
+//  Init_LQ_9AX();
+  ButterworthParameterInit();   //巴特沃斯低通滤波初始化
+  FTM_AB_Init(FTM1);            //编码器初始化
+  FTM_AB_Init(FTM2);            //编码器初始化
+  MenuInit();                   //菜单初始化
+  ADC0_Init();                  //ADC初始化
+  PIT_Init(PIT0, 10);           //定时器0初始化
+  PIT_Init(PIT1, 30);           //定时器1初始化
+//  PIT_Init(PIT2, 5);            //定时器2初始化
+  PIT_Init(PIT3, 70);            //定时器2初始化
+//  GyroInit();
 
- 
 
-  LCD_Init();               //LCD初始化
-  LCD_CLS();                //清屏	  
-//  LCD_Show_LQLogo();        //显示龙邱LOGO
-//  LCD_P14x16Str(0,0,"16"); //字符串显示 
+
+
+
+
+  LCD_CLS();                    //清屏
+//  LCD_Show_LQLogo();          //显示龙邱LOGO
+  LCD_P14x16Str(0,0,"16");      //字符串显示
   
 
  
-  time_delay_ms(500);       //延时  
+//  time_delay_ms(500);           //延时
+  
   
 //#ifdef __USE_TFT18
-//  TFTSPI_CLS(u16BLACK);     //蓝色屏幕	 
+//  TFTSPI_CLS(u16BLACK);       //蓝色屏幕
 //#else    
-//  LCD_CLS();                //清屏	
+//  LCD_CLS();                 //清屏
 //#endif  
-  time_delay_ms(50);        //延时  
-  EnableInterrupts
-  LED_Ctrl(LEDALL, OFF);   
-  //-----------------------------------------------------------------------------------------  
-  //  测试函数都是死循环，每次只能开启一个
-  //-----------------------------------------------------------------------------------------
-  //Test_ADC0();         //测试ADC采集功能               电磁传感器及电源电压监控 
-  //Test_UART();         //测试UART及中断                蓝牙、USB转TTL调试及通信
-  //Test_LED();          //测试GPIO输出口                LED显示及外设控制        
-  //Test_OLED();         //O测试模拟SPI功能              OLED模块功能   
-  //Test_GPIO_KEY();     //测试GPIO输入                  按键检测功能              
-  //Test_GPIO_EXINT();   //测试GPIO输入及外部中断        按键、中断检测功能  
-  //Test_Servo();        //数字舵机测试
-  //Test_Motor();        //直流电机驱动测试，            用龙邱全桥驱动板
-  //Test_9AX();          //测试I2C及龙邱九轴
-  //Test_MPU6050();      //测试I2C及6轴陀螺仪功能
-  //Test_LQV034();       //OLED显示屏及面阵摄像头动图 
-  //Test_PIT();          //测试PIT定时中断功能
-  //Test_AB_Pulse_Cnt(); //测试编码器正交解码功能
-  //Test_LPTMR_delay();  //测试LPTMR延时功能                
-  //Test_LPTMR_Counter();//测试LPTMR计数功能   
-  //Test_DMA_Counter();  //测试DMA计数功能   
-  //TFTSPI_Test();       //测试龙邱TFT1.8吋SPI彩屏
- // Test_OLED();  
-  //-----------------------------------------------------------------------------------------
- // LCD_Show_LQLogo();
-  while(1){  
-    ServoLocPIDCalc(MT9V034());
-    menu();
+  Servo_Duty(servoMedian);
+  time_delay_ms(5);        //延时
+  EnableInterrupts          //中断使能
+  LED_Ctrl(LEDALL, OFF);
+//  -----------------------------------------------------------------------------------------
+//    测试函数都是死循环，每次只能开启一个
+//  -----------------------------------------------------------------------------------------
+//  Test_ADC0();         //测试ADC采集功能               电磁传感器及电源电压监控
+//  Test_UART();         //测试UART及中断                蓝牙、USB转TTL调试及通信
+//  Test_LED();          //测试GPIO输出口                LED显示及外设控制
+//  Test_OLED();         //O测试模拟SPI功能              OLED模块功能
+//  Test_GPIO_KEY();     //测试GPIO输入                  按键检测功能
+//  Test_GPIO_EXINT();   //测试GPIO输入及外部中断        按键、中断检测功能
+//  Test_Servo();        //数字舵机测试
+//  Test_Motor();        //直流电机驱动测试，            用龙邱全桥驱动板
+//  Test_9AX();          //测试I2C及龙邱九轴
+//  Test_MPU6050();      //测试I2C及6轴陀螺仪功能
+//  Test_LQV034();       //OLED显示屏及面阵摄像头动图
+//  Test_PIT();          //测试PIT定时中断功能
+//  Test_AB_Pulse_Cnt(); //测试编码器正交解码功能
+//  Test_LPTMR_delay();  //测试LPTMR延时功能
+//  Test_LPTMR_Counter();//测试LPTMR计数功能
+//  Test_DMA_Counter();  //测试DMA计数功能
+//  TFTSPI_Test();       //测试龙邱TFT1.8吋SPI彩屏
+//  Test_OLED();
+//  -----------------------------------------------------------------------------------------
+//  LCD_Show_LQLogo();
+
+  while(1){
+//    BEE_OFF;
+
+//    VirtualOscilloscope(VirtualOscilloscopeData);
+//    GyroAngleProcessing();
+//    Servo_Duty(servoMedian);
+//    Menu();
+
+//    ReadGyro();
+
+    LED_Ctrl(LED2, RVS);
+
+
+    
   }
 } 
 

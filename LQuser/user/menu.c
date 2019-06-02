@@ -1,255 +1,584 @@
 #include "include.h"
 
-#define NUMBEROFMENUS 7
-#define NUMBEROFSPEED 2
-#define NUMBEROFPID 3
-#define NUMBEROFMOTORPID 6
+#define NUMBER_OF_MENUS 7
+#define NUMBER_OF_SPEED 2
+#define NUMBER_OF_PID 4
+#define NUMBER_OF_MOTOR 4
+#define NUMBER_OF_ERECT 4
+#define NUMBER_OF_ADC 5
+#define NUMBER_OF_GRAPH_SPREAD 2
+#define VARIATION_SPEED_PID 0.001
+#define VARIATION_GRAPH_PID 1
+#define VARIATION_Electromagnetism_PID 0.01
+#define VARIATION_ERECT_PID 0.001
+#define VARIATION_SPEED 10
+#define VARIATION_ERECT 20
+#define VARIATION_SERVO_MEDIA 10
+
+
+
 
 short menuSelection = 0;
 short menuSwitch = 0;
 short temp;
 
-void menu(){
-  char txt[16];
-  
+menu *head = NULL, *menus;
+monitor monitorSelection;
+short menuPages = 0;
+char txt[16];
 
-  
+/**************************
+菜单初始化
+将写好的菜单页使用MenuPageAdd();添加即可使用
+菜单页的添加顺序就是菜单的顺序
+**************************/
+void MenuInit(){
+  if(monitorSelection == OLED){
+    //OLED的菜单页放这里
+    MenuPageAdd(OLEDMenuOfCameraImage);
+    MenuPageAdd(OLEDMenuOfGraphPID);
+    MenuPageAdd(OLEDMenuOfElectromagnetismPID);
+    MenuPageAdd(OLEDMenuOfMotorLeft);
+    MenuPageAdd(OLEDMenuOfMotorRight);
+//    MenuPageAdd(OLEDMenuOfERECT);
+    MenuPageAdd(OLEDMenuOfGyro);
+    MenuPageAdd(OLEDMenuOfADCshow);
+    MenuPageAdd(OLEDMenuOfGraphSpread);
+  }else if(monitorSelection == TFT){
+    //TFT1.8的菜单页放这里
+    MenuPageAdd(TFTMenuOfMT9V034);
+    TFTSPI_CLS(u16WHITE);
+  }
+//  MenuPageAdd(MenuOfADCMedia);
+//  MenuPageAdd(menuOfSpeedMeasure);
+  menus = head;
+}
 
+void Menu(){
 
   if(!KEY_Read(left)){
-    time_delay_ms(100);
-    if(!KEY_Read(left)){
-      menuSelection --;
+      if(!KEY_Read(left)){
+        menus = menus->last;
+        LCD_CLS();
+      }
+    }else if(!KEY_Read(right)){
+      if(!KEY_Read(right)){
+        menus = menus->next;
+        LCD_CLS();
+      }
+    }
+    
+
+    (*menus->page)();
+}
+
+void MenuPageAdd(void (*aPage)(void)) {
+  menu *node = NULL;
+  node = (menu *)malloc(sizeof(menu));
+  if(!head){
+    head = node;
+  }
+
+  menus = head;
+  node->next = head;
+  node->page = aPage;
+
+  while(!(menus->next == head)){
+    menus = menus->next;
+  }
+  node->last = menus;
+  menus->next = node;
+  head->last = node;
+}
+
+
+void TFTMenuOfMT9V034(){
+
+  for (int i = GRAPH_HIGHT - 1; i > 0; i--){
+    for (int j = 87 - 1; j > 7; j--){
+      TFTSPI_Draw_Dot(2*j - 14, 2*i, Image_Use[i][j]);
+      TFTSPI_Draw_Dot(2*j - 14+ 1, 2*i + 1, Image_Use[i][j]);
+      TFTSPI_Draw_Dot(2*j - 14+ 1, 2*i, Image_Use[i][j]);
+      TFTSPI_Draw_Dot(2*j - 14, 2*i + 1, Image_Use[i][j]);
+
+    }
+  }
+
+}
+
+
+void OLEDMenuOfGraphSpread(){
+  if(!KEY_Read(middle)){
+    time_delay_ms(700);
+    if(!KEY_Read(middle)){
+      menuSwitch++;
+    }
+  }
+
+  menuSwitch = menuSwitch % NUMBER_OF_GRAPH_SPREAD;
+
+  if(menuSwitch){
+    UART_Put_Char(UART_4, 0x00);
+    UART_Put_Char(UART_4, 0xFF);
+    UART_Put_Char(UART_4, 0x01);
+    UART_Put_Char(UART_4, 0x00);
+    for(int i = 0; i < GRAPH_HIGHT - 1; i++){
+      for(int j = 0; j < GRAPH_WIDTH - 1; j++){
+        UART_Put_Char(UART_4, Image_Use[i][j]);
+      }
+    }
+    LCD_P14x16Str(0,2,"Spread start");
+  }else{
+    LCD_P14x16Str(0,2,"Spread stop");
+    LCD_CLS();
+  }
+}
+
+
+void OLEDMenuOfCameraImage(){
+  LCD_Show_Frame100();
+  Draw_Road();
+  LCD_P8x16Str(0,0,"Graph");
+  sprintf(txt,"%03d",threshold);
+  LCD_P6x8Str(100,1,(u8*)txt);
+}
+
+
+void OLEDMenuOfERECT(){
+  if (!KEY_Read(middle)) {
+    if (!KEY_Read(middle)) {
+      menuSwitch++;
       LCD_CLS();
     }
-  }else if(!KEY_Read(right)){
-    time_delay_ms(100);
-    if(!KEY_Read(right)){
-      menuSelection ++;
-      LCD_CLS();
+  }
+
+  if (!KEY_Read(up)) {
+    if (!KEY_Read(up)) {
+      if (menuSwitch == 0) {
+        PIDErect.proportion += VARIATION_ERECT_PID;
+      } else if (menuSwitch == 1) {
+        PIDErect.integral += VARIATION_ERECT_PID;
+      } else if (menuSwitch == 2) {
+        PIDErect.derivative += VARIATION_ERECT_PID;
+      } else if (menuSwitch == 3) {
+        PIDErect.setPoint += VARIATION_ERECT;
+      }
+    }
+  }else if(!KEY_Read(down)) {
+    if (!KEY_Read(down)) {
+      if (menuSwitch == 0) {
+        PIDErect.proportion -= VARIATION_ERECT_PID;
+      } else if (menuSwitch == 1) {
+        PIDErect.integral -= VARIATION_ERECT_PID;
+      } else if (menuSwitch == 2) {
+        PIDErect.derivative -= VARIATION_ERECT_PID;
+      } else if (menuSwitch == 3) {
+        PIDErect.setPoint -= VARIATION_ERECT;
+      }
     }
   }
 
-  if(menuSelection < 0){
-    menuSelection = NUMBEROFMENUS - 1;
+  menuSwitch = menuSwitch % NUMBER_OF_ERECT;
+
+  temp = (int) (PIDErect.proportion * (1/VARIATION_ERECT_PID));
+  sprintf(txt, "P:%04d", temp);
+  LCD_P8x16Str(10, 2, (u8*) txt);
+
+  temp = (int) (PIDErect.integral * (1/VARIATION_ERECT_PID));
+  sprintf(txt, "I:%04d", temp);
+  LCD_P8x16Str(10, 4, (u8*) txt);
+
+  temp = (int) (PIDErect.derivative * (1/VARIATION_ERECT_PID));
+  sprintf(txt, "D:%04d", temp);
+  LCD_P8x16Str(10, 6, (u8*) txt);
+
+
+  sprintf(txt, "%04d", PIDErect.setPoint);
+  LCD_P8x16Str(80, 4, (u8*) txt);
+
+  sprintf(txt, "%04d", speedRightGet);
+  LCD_P8x16Str(80, 6, (u8*) txt);
+
+  LCD_P8x16Str(0, 0, "Erect");
+  LCD_P8x16Str(70, 2, "Bary");
+  if ((menuSwitch + 1) * 2 < 8) {
+    LCD_P8x16Str(0, (menuSwitch + 1) * 2, ">");
+  } else {
+    LCD_P8x16Str(70, (menuSwitch + 1) * 2 - 4, ">");
   }
-  menuSelection = menuSelection%NUMBEROFMENUS;
-  
-  if(menuSelection == 0){
-    LCD_Show_Frame100(); 
-    Draw_Road();
-    LCD_P8x16Str(0,0,"Camera Image");
-    sprintf(txt,"%03d",Threshold);
-    LCD_P6x8Str(100,1,(u8*)txt);
-  }else if(menuSelection == 1){         //PID Adjust
-
-    if(!KEY_Read(Middle)){
-      time_delay_ms(100);
-      if(!KEY_Read(Middle)){
-        menuSwitch++;
-        LCD_CLS();
-      }
-    }
-    menuSwitch = menuSwitch%NUMBEROFPID;
-
-    if(!KEY_Read(Up)){
-      time_delay_ms(100);
-      if(!KEY_Read(Up)){
-        if(menuSwitch == 0){
-          PIDServo.Proportion += 0.001;
-        }else if(menuSwitch == 1){
-          PIDServo.Integral += 0.001;
-        }else{
-          PIDServo.Derivative += 0.001;
-        }
-      }
-    }else if(!KEY_Read(Down)){
-      time_delay_ms(100);
-      if(!KEY_Read(Down)){
-        if(menuSwitch == 0){
-          PIDServo.Proportion -= 0.001;
-        }else if(menuSwitch == 1){
-          PIDServo.Integral -= 0.001;
-        }else{
-          PIDServo.Derivative -= 0.001;
-        }
-      }
-    }
-
-
-    temp = (int)(PIDServo.Proportion*1000);
-    sprintf(txt,"P:%04d",temp);
-    LCD_P8x16Str(20,2,(u8*)txt);
-
-    temp = (int)(PIDServo.Integral*1000);
-    sprintf(txt,"I:%04d",temp);
-    LCD_P8x16Str(20,4,(u8*)txt);
-
-    temp = (int)(PIDServo.Derivative*1000);
-    sprintf(txt,"D:%04d",temp);
-    LCD_P8x16Str(20,6,(u8*)txt);
-
-
-    LCD_P8x16Str(0,0,"PID Adjust");
-    LCD_P8x16Str(0,(menuSwitch+1)*2,"->");
-
-  }else if(menuSelection == 2){         //Speed Adjust
-    if(!KEY_Read(Middle)){
-      time_delay_ms(100);
-      if(!KEY_Read(Middle)){
-        menuSwitch ++;
-        LCD_CLS();
-      }
-    }
-
-    menuSwitch = menuSwitch%NUMBEROFSPEED;
-
-    if(!KEY_Read(Up)){
-      time_delay_ms(100);
-      if(!KEY_Read(Up)){
-        if(menuSwitch == 0){
-          PIDMotorLeft.SetPoint += 10;
-          LCD_CLS();
-        }else{
-          PIDMotorRight.SetPoint += 10;
-          LCD_CLS();
-        }
-      }
-    }else if(!KEY_Read(Down)){
-      time_delay_ms(100);
-      if(!KEY_Read(Down)){
-        if(menuSwitch == 0){
-          PIDMotorLeft.SetPoint -= 10;
-          LCD_CLS();
-        }else{
-          PIDMotorRight.SetPoint -= 10;
-          LCD_CLS();
-        }
-      }
-    }
-
-
-
-
-    sprintf(txt,"L:%04d   %04d",PIDMotorLeft.SetPoint, speedLeftGet);
-    LCD_P8x16Str(10,4,(u8*)txt);
-
-    sprintf(txt,"R:%04d   %04d",PIDMotorRight.SetPoint, speedRightGet);
-    LCD_P8x16Str(10,6,(u8*)txt);
-
-
-    LCD_P8x16Str(0,0,"Speed Adjust");
-    LCD_P8x16Str(30,2,"SET");
-    LCD_P8x16Str(80,2,"Actual");
-    LCD_P8x16Str(0,(menuSwitch+1)*2+2,">");
-
-  }else if(menuSelection == 3){         //Servo Adjust
-    if(!KEY_Read(Up)){
-      time_delay_ms(100);
-      if(!KEY_Read(Up)){
-        SERVOMEDIAN += 10;
-      }
-    }else if(!KEY_Read(Down)){
-      time_delay_ms(100);
-      if(!KEY_Read(Down)){
-        SERVOMEDIAN -= 10;
-      }
-    }
-    sprintf(txt," Median:%04d",SERVOMEDIAN);
-    LCD_P8x16Str(20,4,(u8*)txt);
-
-    sprintf(txt,"Current:%04d",servo);
-    LCD_P8x16Str(20,2,(u8*)txt);
-
-    LCD_P8x16Str(0,0,"Servo Adjust");
-
-  }else if(menuSelection == 4){         //Speed Show
-
-    if(!KEY_Read(Middle)){
-      time_delay_ms(100);
-      if(!KEY_Read(Middle)){
-        menuSwitch++;
-        LCD_CLS();
-      }
-    }
-    menuSwitch = menuSwitch%NUMBEROFMOTORPID;
-
-    if(!KEY_Read(Up)){
-      time_delay_ms(100);
-      if(!KEY_Read(Up)){
-        if(menuSwitch == 0){
-          PIDMotorLeft.Proportion += 0.001;
-        }else if(menuSwitch == 1){
-          PIDMotorLeft.Integral += 0.001;
-        }else if(menuSwitch == 2){
-          PIDMotorLeft.Derivative += 0.001;
-        }else if(menuSwitch == 3){
-          PIDMotorRight.Proportion += 0.001;
-        }else if(menuSwitch == 4){
-          PIDMotorRight.Integral += 0.001;
-        }else if(menuSwitch == 5){
-          PIDMotorRight.Derivative += 0.001;
-        }
-      }
-    }else if(!KEY_Read(Down)){
-      time_delay_ms(100);
-      if(!KEY_Read(Down)){
-        if(menuSwitch == 0){
-          PIDMotorLeft.Proportion -= 0.001;
-        }else if(menuSwitch == 1){
-          PIDMotorLeft.Integral -= 0.001;
-        }else if(menuSwitch == 2){
-          PIDMotorLeft.Derivative -= 0.001;
-        }else if(menuSwitch == 3){
-          PIDMotorRight.Proportion -= 0.001;
-        }else if(menuSwitch == 4){
-          PIDMotorRight.Integral -= 0.001;
-        }else if(menuSwitch == 5){
-          PIDMotorRight.Derivative -= 0.001;
-        }
-      }
-    }
-
-
-    temp = (int)(PIDMotorLeft.Proportion*1000);
-    sprintf(txt,"P:%04d",temp);
-    LCD_P8x16Str(10,2,(u8*)txt);
-
-    temp = (int)(PIDMotorLeft.Integral*1000);
-    sprintf(txt,"I:%04d",temp);
-    LCD_P8x16Str(10,4,(u8*)txt);
-
-    temp = (int)(PIDMotorLeft.Derivative*1000);
-    sprintf(txt,"D:%04d",temp);
-    LCD_P8x16Str(10,6,(u8*)txt);
-
-    temp = (int)(PIDMotorRight.Proportion*1000);
-    sprintf(txt,"P:%04d",temp);
-    LCD_P8x16Str(80,2,(u8*)txt);
-
-    temp = (int)(PIDMotorRight.Integral*1000);
-    sprintf(txt,"I:%04d",temp);
-    LCD_P8x16Str(80,4,(u8*)txt);
-
-    temp = (int)(PIDMotorRight.Derivative*1000);
-    sprintf(txt,"D:%04d",temp);
-    LCD_P8x16Str(80,6,(u8*)txt);
-
-
-    LCD_P8x16Str(0,0,"MotorPID Adjust");
-    if((menuSwitch+1)*2 < 8){
-      LCD_P8x16Str(0,(menuSwitch+1)*2,">");
-    }else{
-      LCD_P8x16Str(70,(menuSwitch+1)*2-6,">");
-    }
-
-  }else if(menuSelection == 5){
-    LCD_P6x8Str(40,1,"5");
-  }else if(menuSelection == 6){
-    LCD_P6x8Str(40,1,"6");
-  }
-  
-
 
 
 }
+
+
+void OLEDMenuOfMotorRight(){
+  if (!KEY_Read(middle)) {
+    if (!KEY_Read(middle)) {
+      menuSwitch++;
+      LCD_CLS();
+    }
+  }
+  menuSwitch = menuSwitch % NUMBER_OF_MOTOR;
+
+  if (!KEY_Read(up)) {
+    if (!KEY_Read(up)) {
+      if (menuSwitch == 0) {
+        PIDMotorRight.proportion += VARIATION_SPEED_PID;
+      } else if (menuSwitch == 1) {
+        PIDMotorRight.integral += VARIATION_SPEED_PID;
+      } else if (menuSwitch == 2) {
+        PIDMotorRight.derivative += VARIATION_SPEED_PID;
+      } else if (menuSwitch == 3) {
+        PIDMotorRight.setPoint += VARIATION_SPEED;
+      }
+    }
+  }else if(!KEY_Read(down)) {
+    if (!KEY_Read(down)) {
+      if (menuSwitch == 0) {
+        PIDMotorRight.proportion -= VARIATION_SPEED_PID;
+      } else if (menuSwitch == 1) {
+        PIDMotorRight.integral -= VARIATION_SPEED_PID;
+      } else if (menuSwitch == 2) {
+        PIDMotorRight.derivative -= VARIATION_SPEED_PID;
+      } else if (menuSwitch == 3) {
+        PIDMotorRight.setPoint -= VARIATION_SPEED;
+      }
+    }
+  }
+
+  temp = (int) (PIDMotorRight.proportion * (1/VARIATION_SPEED_PID));
+  sprintf(txt, "P:%04d", temp);
+  LCD_P8x16Str(10, 2, (u8*) txt);
+
+  temp = (int) (PIDMotorRight.integral * (1/VARIATION_SPEED_PID));
+  sprintf(txt, "I:%04d", temp);
+  LCD_P8x16Str(10, 4, (u8*) txt);
+
+  temp = (int) (PIDMotorRight.derivative * (1/VARIATION_SPEED_PID));
+  sprintf(txt, "D:%04d", temp);
+  LCD_P8x16Str(10, 6, (u8*) txt);
+
+
+  sprintf(txt, "%04d", PIDMotorRight.setPoint);
+  LCD_P8x16Str(80, 4, (u8*) txt);
+
+  sprintf(txt, "%04d", speedRightGet);
+  LCD_P8x16Str(80, 6, (u8*) txt);
+
+  LCD_P8x16Str(0, 0, "Right Motor");
+  LCD_P8x16Str(80, 2, "Speed");
+  if ((menuSwitch + 1) * 2 < 8) {
+    LCD_P8x16Str(0, (menuSwitch + 1) * 2, ">");
+  } else {
+    LCD_P8x16Str(70, (menuSwitch + 1) * 2 - 4, ">");
+  }
+
+}
+
+
+void OLEDMenuOfMotorLeft(){
+  if (!KEY_Read(middle)) {
+
+    if (!KEY_Read(middle)) {
+      menuSwitch++;
+      LCD_CLS();
+    }
+  }
+  menuSwitch = menuSwitch % NUMBER_OF_MOTOR;
+
+  if (!KEY_Read(up)) {
+    if (!KEY_Read(up)) {
+      if (menuSwitch == 0) {
+        PIDMotorLeft.proportion += VARIATION_SPEED_PID;
+      } else if (menuSwitch == 1) {
+        PIDMotorLeft.integral += VARIATION_SPEED_PID;
+      } else if (menuSwitch == 2) {
+        PIDMotorLeft.derivative += VARIATION_SPEED_PID;
+      } else if (menuSwitch == 3) {
+        PIDMotorLeft.setPoint += VARIATION_SPEED;
+      }
+    }
+  } else if (!KEY_Read(down)) {
+    if (!KEY_Read(down)) {
+      if (menuSwitch == 0) {
+        PIDMotorLeft.proportion -= VARIATION_SPEED_PID;
+      } else if (menuSwitch == 1) {
+        PIDMotorLeft.integral -= VARIATION_SPEED_PID;
+      } else if (menuSwitch == 2) {
+        PIDMotorLeft.derivative -= VARIATION_SPEED_PID;
+      } else if (menuSwitch == 3) {
+        PIDMotorLeft.setPoint -= VARIATION_SPEED;
+      }
+    }
+  }
+
+  temp = (int) (PIDMotorLeft.proportion * (1/VARIATION_SPEED_PID));
+  sprintf(txt, "P:%04d", temp);
+  LCD_P8x16Str(10, 2, (u8*) txt);
+
+  temp = (int) (PIDMotorLeft.integral * (1/VARIATION_SPEED_PID));
+  sprintf(txt, "I:%04d", temp);
+  LCD_P8x16Str(10, 4, (u8*) txt);
+
+  temp = (int) (PIDMotorLeft.derivative * (1/VARIATION_SPEED_PID));
+  sprintf(txt, "D:%04d", temp);
+  LCD_P8x16Str(10, 6, (u8*) txt);
+
+
+  sprintf(txt, "%04d", PIDMotorLeft.setPoint);
+  LCD_P8x16Str(80, 4, (u8*) txt);
+
+  sprintf(txt, "%04d", speedLeftGet);
+  LCD_P8x16Str(80, 6, (u8*) txt);
+
+  LCD_P8x16Str(0, 0, "Left Motor");
+  LCD_P8x16Str(80, 2, "Speed");
+  if ((menuSwitch + 1) * 2 < 8) {
+    LCD_P8x16Str(0, (menuSwitch + 1) * 2, ">");
+  } else {
+    LCD_P8x16Str(70, (menuSwitch + 1) * 2 - 4, ">");
+  }
+
+}
+
+void OLEDMenuOfGraphPID(){
+  if(!KEY_Read(middle)){
+    if(!KEY_Read(middle)){
+      menuSwitch++;
+      LCD_CLS();
+    }
+  }
+  menuSwitch = menuSwitch%NUMBER_OF_PID;
+
+  if(!KEY_Read(up)){
+    if(!KEY_Read(up)){
+      if(menuSwitch == 0){
+        PIDServoOfGraph.proportion += VARIATION_GRAPH_PID;
+      }else if(menuSwitch == 1){
+        PIDServoOfGraph.integral += VARIATION_GRAPH_PID;
+      }else if(menuSwitch == 2){
+        PIDServoOfGraph.derivative += VARIATION_GRAPH_PID;
+      }else if(menuSwitch == 3){
+        servoMedian += VARIATION_SERVO_MEDIA;
+      }
+    }
+  }else if(!KEY_Read(down)){
+    if(!KEY_Read(down)){
+      if(menuSwitch == 0){
+        PIDServoOfGraph.proportion -= VARIATION_GRAPH_PID;
+      }else if(menuSwitch == 1){
+        PIDServoOfGraph.integral -= VARIATION_GRAPH_PID;
+      }else if(menuSwitch == 2){
+        PIDServoOfGraph.derivative -= VARIATION_GRAPH_PID;
+      }else if(menuSwitch == 3){
+        servoMedian -= VARIATION_SERVO_MEDIA;
+      }
+    }
+  }
+
+  temp = (int)(PIDServoOfGraph.proportion * (1/VARIATION_GRAPH_PID));
+  sprintf(txt,"P:%04d",temp);
+  LCD_P8x16Str(20,2,(u8*)txt);
+
+  temp = (int)(PIDServoOfGraph.integral * (1/VARIATION_GRAPH_PID));
+  sprintf(txt,"I:%04d",temp);
+  LCD_P8x16Str(20,4,(u8*)txt);
+
+  temp = (int)(PIDServoOfGraph.derivative * (1/VARIATION_GRAPH_PID));
+  sprintf(txt,"D:%04d",temp);
+  LCD_P8x16Str(20,6,(u8*)txt);
+
+  sprintf(txt, "MEDIAN");
+  LCD_P8x16Str(80, 2, (u8*) txt);
+
+  sprintf(txt, "%04d", servoMedian);
+  LCD_P8x16Str(80, 4, (u8*) txt);
+
+  sprintf(txt, "%04d", servo);
+  LCD_P8x16Str(80, 6, (u8*) txt);
+
+
+  LCD_P8x16Str(0,0,"Graph PID");
+    
+  if(menuSwitch == 3){
+  LCD_P8x16Str(70,4,">");
+  }else{
+    LCD_P8x16Str(0,(menuSwitch+1)*2,"->");
+  }
+
+
+}
+
+void OLEDMenuOfElectromagnetismPID(){
+  if(!KEY_Read(middle)){
+    if(!KEY_Read(middle)){
+      menuSwitch++;
+      LCD_CLS();
+    }
+  }
+  menuSwitch = menuSwitch%NUMBER_OF_PID;
+
+  if(!KEY_Read(up)){
+    if(!KEY_Read(up)){
+      if(menuSwitch == 0){
+        PIDServoOfElectromagnetism.proportion += VARIATION_Electromagnetism_PID;
+      }else if(menuSwitch == 1){
+        PIDServoOfElectromagnetism.integral += VARIATION_Electromagnetism_PID;
+      }else if(menuSwitch == 2){
+        PIDServoOfElectromagnetism.derivative += VARIATION_Electromagnetism_PID;
+      }else if(menuSwitch == 3){
+        servoMedian += VARIATION_SERVO_MEDIA;
+      }
+    }
+  }else if(!KEY_Read(down)){
+    if(!KEY_Read(down)){
+      if(menuSwitch == 0){
+        PIDServoOfElectromagnetism.proportion -= VARIATION_Electromagnetism_PID;
+      }else if(menuSwitch == 1){
+        PIDServoOfElectromagnetism.integral -= VARIATION_Electromagnetism_PID;
+      }else if(menuSwitch == 2){
+        PIDServoOfElectromagnetism.derivative -= VARIATION_Electromagnetism_PID;
+      }else if(menuSwitch == 3){
+        servoMedian -= VARIATION_SERVO_MEDIA;
+      }
+    }
+  }
+
+  temp = (int)(PIDServoOfElectromagnetism.proportion * (1/VARIATION_Electromagnetism_PID));
+  sprintf(txt,"P:%04d",temp);
+  LCD_P8x16Str(20,2,(u8*)txt);
+
+  temp = (int)(PIDServoOfElectromagnetism.integral * (1/VARIATION_Electromagnetism_PID));
+  sprintf(txt,"I:%04d",temp);
+  LCD_P8x16Str(20,4,(u8*)txt);
+
+  temp = (int)(PIDServoOfElectromagnetism.derivative * (1/VARIATION_Electromagnetism_PID));
+  sprintf(txt,"D:%04d",temp);
+  LCD_P8x16Str(20,6,(u8*)txt);
+
+  sprintf(txt, "MEDIAN");
+  LCD_P8x16Str(80, 2, (u8*) txt);
+
+  sprintf(txt, "%04d", servoMedian);
+  LCD_P8x16Str(80, 4, (u8*) txt);
+
+  sprintf(txt, "%04d", servo);
+  LCD_P8x16Str(80, 6, (u8*) txt);
+
+
+  LCD_P8x16Str(0,0,"Electromagnetism PID");
+
+  if(menuSwitch == 3){
+  LCD_P8x16Str(70,4,">");
+  }else{
+    LCD_P8x16Str(0,(menuSwitch+1)*2,"->");
+  }
+
+
+}
+
+
+void OLEDMenuOfGyro(){
+//  u16 tem=0;
+//  float fv=0.01;
+//  char  txt[16]="X:";
+//  Update9AX();
+//  if (GYRO_X.MYBYTE.BYTEH > 0x7F)            //判断加速度X轴正负,此处为负值
+//  {
+//    tem = (~(GYRO_X.MYWORD >> 2) + 1) & 0X3FFF;  //把补码数值转换为有效值
+//  } else                                    //正数情况处理
+//  {
+//    tem = (GYRO_X.MYWORD >> 2) & 0X3FFF;          //转换为有效值
+//  }
+//  sprintf(txt, "DJ0:%04d", GYRO_Y.MYWORD);             //数值转换为字符串
+//  LCD_P8x16Str(10, 0, (uint8*) txt);          //OLED屏显示转向数值
+//
+//  //转换为加速度数值
+//  Cvt_14bit_Str(txt, ACC_X);                //加速度数值专为固定格式字符串，方便屏幕显示
+//  LCD_P6x8Str(10, 4, (uint8*) txt);           //OLED屏显示数值
+//
+//  //温度检测
+//  if (LQ9AX_DAT[18] > 0x7F)                   //温度位正数0--125°
+//  {
+//    LCD_P6x8Str(10, 6, (uint8*) "low temp  ");    //OLED屏显示数值
+//  } else {
+//    sprintf(txt, "temp:+%03d ", LQ9AX_DAT[18]);  //转换为字符串
+//    LCD_P6x8Str(10, 6, (uint8*) txt);             //OLED屏显示数值
+//  }
+//  time_delay_ms(100);
+
+    sprintf(txt, "DJ0:%04d", angle);             //数值转换为字符串
+    LCD_P8x16Str(10, 0, (uint8*) txt);
+}
+
+
+
+void OLEDMenuOfADCshow(){
+//  ADC0_Ch_e ADCRemawp[] = {ADC0_SE5a, ADC0_SE9, ADC0_DP1, ADC0_SE11, ADC0_DP3, ADC0_SE4a, ADC0_SE10, ADC0_DP2};
+  ADC0_Ch_e ADCRemawp[] = {ADC0_DP1, ADC0_SE5a, ADC0_DP2, ADC0_DP3,  ADC0_SE11, ADC0_SE9, ADC0_SE4a, ADC0_SE10};
+//  if(!KEY_Read(Up)){
+//    time_delay_ms(100);
+//    if(!KEY_Read(Up)){
+//      menuSwitch++;
+//    }
+//  }else if(!KEY_Read(Down)){
+//    time_delay_ms(100);
+//    if(!KEY_Read(Down)){
+//      menuSwitch--;
+//      if(menuSwitch<0){
+//       menuSwitch = NUMBEROFADC-1;
+//      }
+//  }
+//
+//  menuSwitch = menuSwitch % NUMBEROFADC;
+
+
+  if(!KEY_Read(up)){
+    if(!KEY_Read(up)){
+      menuSwitch += 1;
+    }
+  }else if(!KEY_Read(down)){
+    if(!KEY_Read(down)){
+      menuSwitch -= 1;
+      if(menuSwitch<0){
+        menuSwitch = NUMBER_OF_ADC;
+      }
+    }
+  }
+
+  LCD_CLS();
+
+  sprintf(txt,"ADC%d:%d",(menuSwitch+0)%(NUMBER_OF_ADC),ADC0_Ave(ADCRemawp[(menuSwitch+0)%(NUMBER_OF_ADC)],ADC_16bit,10));  //2
+  LCD_P8x16Str(0,0,(u8*)txt);
+
+  sprintf(txt,"ADC%d:%d",(menuSwitch+1)%(NUMBER_OF_ADC),ADC0_Ave(ADCRemawp[(menuSwitch+1)%(NUMBER_OF_ADC)],ADC_16bit,10)); //0
+  LCD_P8x16Str(0,2,(u8*)txt);
+
+  sprintf(txt,"ADC%d:%d",(menuSwitch+2)%(NUMBER_OF_ADC),ADC0_Ave(ADCRemawp[(menuSwitch+2)%(NUMBER_OF_ADC)],ADC_16bit,10)); //7
+  LCD_P8x16Str(0,4,(u8*)txt);
+
+  sprintf(txt,"ADC%d:%d",(menuSwitch+3)%(NUMBER_OF_ADC),ADC0_Ave(ADCRemawp[(menuSwitch+3)%(NUMBER_OF_ADC)],ADC_16bit,10)); //4
+  LCD_P8x16Str(0,6,(u8*)txt);
+
+
+  time_delay_ms(10);
+
+}
+
+void OLEDMenuOfADCMedia(){
+  ADC0_Ch_e ADCRemawp[] = {ADC0_DP1, ADC0_SE5a, ADC0_DP2, ADC0_DP3,  ADC0_SE11, ADC0_SE9, ADC0_SE4a, ADC0_SE10};
+  sprintf(txt,"ADC:%d",(int)(ADC0_Ave(ADCRemawp[3],ADC_16bit,10)-ADC0_Ave(ADCRemawp[0],ADC_16bit,10)+ADC0_Ave(ADCRemawp[2],ADC_16bit,10)-ADC0_Ave(ADCRemawp[1],ADC_16bit,10))*10000
+                           /(ADC0_Ave(ADCRemawp[3],ADC_16bit,10)+ADC0_Ave(ADCRemawp[0],ADC_16bit,10)+ADC0_Ave(ADCRemawp[2],ADC_16bit,10)+ADC0_Ave(ADCRemawp[1],ADC_16bit,10)));
+  LCD_P8x16Str(0,3,(u8*)txt);
+}
+
+
+void MenuOfPrecisionAdjustment(){
+
+}
+
+
+void OLEDMenuOfSpeedMeasure(){
+
+}
+

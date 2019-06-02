@@ -2431,6 +2431,42 @@
         </group>
     </group>
     <group>
+        <name>Processing</name>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\APPmain.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\filter.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\filter.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\mathematics.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\mathematics.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\menu.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\menu.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\PID.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\PID.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\processing.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\processing.h</name>
+        </file>
+    </group>
+    <group>
         <name>startup</name>
         <file>
             <name>$PROJ_DIR$\LQuser\devices\startup\startup.c</name>
@@ -2520,13 +2556,16 @@
     <group>
         <name>user</name>
         <file>
-            <name>$PROJ_DIR$\LQuser\user\APPmain.c</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\LQuser\user\common.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\LQuser\user\include.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\L3G4200D.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\LQuser\user\L3G4200D.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\LQuser\user\LPTMR.c</name>
@@ -2637,16 +2676,10 @@
             <name>$PROJ_DIR$\LQuser\user\LQWDOG.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\LQuser\user\menu.c</name>
+            <name>$PROJ_DIR$\LQuser\user\simulationIIC.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\LQuser\user\menu.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\LQuser\user\PID.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\LQuser\user\PID.h</name>
+            <name>$PROJ_DIR$\LQuser\user\simulationIIC.h</name>
         </file>
     </group>
     <group>

@@ -21,6 +21,7 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 extern uint32 core_clk_M;//单位MHZ
 extern uint32 bus_clk_M;//单位MHZ
 
+extern int VirtualOscilloscopeData[4];
 //定义模块号
 typedef enum
 {
@@ -79,6 +80,9 @@ extern void UART1_IRQHandler(void);
 extern void UART2_IRQHandler(void);
 extern void UART3_IRQHandler(void);
 extern void UART4_IRQHandler(void);
+
+extern int VirtualOscilloscope(int *data);
+extern void VirtualOscilloscopeOfVcan();
 /********************************************************************/
 void Test_UART(void);
 #endif 

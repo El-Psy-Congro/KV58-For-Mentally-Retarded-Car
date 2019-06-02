@@ -43,11 +43,11 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 
 typedef union
 {
-  u16 MYWORD;
+  s16 MYWORD;
   struct
   {
-    u8 BYTEL;//低8位
-    u8 BYTEH;//高8位，跟CODEWARRIOR大端模式不同
+    s8 BYTEL;//低8位
+    s8 BYTEH;//高8位，跟CODEWARRIOR大端模式不同
   } MYBYTE;
 }LQ9AXt;
 
@@ -59,6 +59,7 @@ extern LQ9AXt ACC_X,ACC_Y,ACC_Z,GYRO_X,GYRO_Y,GYRO_Z,MAG_X,MAG_Y,MAG_Z;
 extern void Init_LQ_9AX(void);
 extern void Update9AX(void);
 extern void Cvt_14bit_Str(s8 str[],LQ9AXt V2);
+extern int ReadGyro();
 /********************************************************************/
 
 #endif 

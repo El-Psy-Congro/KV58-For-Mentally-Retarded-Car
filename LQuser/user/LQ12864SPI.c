@@ -457,7 +457,7 @@ void LCD_Init(void)
   LCD_WrCmd(0xaf);//--turn on oled panel
   LCD_Fill(0x00);  //初始清屏
   LCD_Set_Pos(0,0);  
-  
+  monitorSelection = OLED;
 } 
 //==============================================================
 //函数名： void LCD_PutPixel(unsigned char x,unsigned char y)
@@ -807,13 +807,13 @@ void Test_OLED(void)
     while (1)
     {  
       //测试按键      
-      if(KEY_Read(Up)==0)
+      if(KEY_Read(up)==0)
         LCD_P6x8Str(13,3,(uint8_t*)"KEY0 Pressed!   ");
       else LCD_P6x8Str(13,3,(uint8_t*)"KEY0 NO Pressed!");
-      if(KEY_Read(Down)==0)
+      if(KEY_Read(down)==0)
         LCD_P6x8Str(13,5,(uint8_t*)"KEY1 Pressed!   ");
       else LCD_P6x8Str(13,5,(uint8_t*)"KEY1 NO Pressed!");
-      if(KEY_Read(Middle)==0)
+      if(KEY_Read(middle)==0)
         LCD_P6x8Str(13,7,(uint8_t*)"KEY2 Pressed!   ");
       else LCD_P6x8Str(13,7,(uint8_t*)"KEY2 NO Pressed!");
       

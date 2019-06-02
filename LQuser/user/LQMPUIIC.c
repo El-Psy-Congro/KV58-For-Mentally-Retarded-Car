@@ -1,4 +1,3 @@
-
 #include "include.h"
 
 #define MPU_SDA_IN()  gpio_init(PTH3,GPI,HIGH)

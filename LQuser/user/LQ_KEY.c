@@ -30,7 +30,7 @@ u8 KEY_Read(KEYn_e keyno)
 {
   switch(keyno) 
   {
-  case Down:
+  case down:
     return GPIO_Get(PTC7);
     break;
     
@@ -38,7 +38,7 @@ u8 KEY_Read(KEYn_e keyno)
     return GPIO_Get(PTC8);
     break;
     
-  case Middle:
+  case middle:
     return GPIO_Get(PTC9);
     break;
     
@@ -46,7 +46,7 @@ u8 KEY_Read(KEYn_e keyno)
     return GPIO_Get(PTC12);
     break;
   
-  case Up:
+  case up:
     return GPIO_Get(PTC13);
     break;
     
@@ -69,13 +69,13 @@ void Test_GPIO_KEY(void)
   while (1)
   {  
     //²âÊÔ°´¼ü      
-    if(KEY_Read(Up)==0)
+    if(KEY_Read(up)==0)
       LCD_P6x8Str(13,3,(uint8_t*)"KEY0 Pressed!   ");
     else LCD_P6x8Str(13,3,(uint8_t*)"KEY0 NO Pressed!");
-    if(KEY_Read(Down)==0)
+    if(KEY_Read(down)==0)
       LCD_P6x8Str(13,5,(uint8_t*)"KEY1 Pressed!   ");
     else LCD_P6x8Str(13,5,(uint8_t*)"KEY1 NO Pressed!");
-    if(KEY_Read(Middle)==0)
+    if(KEY_Read(middle)==0)
       LCD_P6x8Str(13,7,(uint8_t*)"KEY2 Pressed!   ");
     else LCD_P6x8Str(13,7,(uint8_t*)"KEY2 NO Pressed!");
     
