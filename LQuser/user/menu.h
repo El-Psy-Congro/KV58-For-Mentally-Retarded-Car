@@ -12,6 +12,7 @@ void OLEDMenuOfGraphPID();
 void OLEDMenuOfElectromagnetismPID();
 void OLEDMenuOfMotorLeft();
 void OLEDMenuOfMotorRight();
+void OLEDMenuOfMotor();
 void OLEDMenuOfGyro();
 void OLEDMenuOfADCshow();
 void OLEDMenuOfADCMedia();

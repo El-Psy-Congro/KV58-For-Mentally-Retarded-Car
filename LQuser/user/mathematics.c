@@ -1,13 +1,37 @@
 #include "include.h"
 
 
-int LimitingAmplitude(int value, int min, int max){
-  if(value < min){
-    value = min;
-  }else if(value > max){
-    value = max;
+void LimitingAmplitude(int *value, int min, int max){
+  if(max > min){                //为防止输入是应人为因素导致max<min
+    if(*value < min){
+      *value = min;
+    }else if(*value > max){
+      *value = max;
+    }
+  }else{
+    if(*value < max){
+      *value = max;
+    }else if(*value > min){
+      *value = min;
+    }
   }
+}
 
+int LimitingAmplitudeVersionReturn(int value, int min, int max){
+  if(max > min){                //为防止输入是应人为因素导致max<min
+    if(value < min){
+      value = min;
+    }else if(value > max){
+      value = max;
+    }
+  }else{
+    if(value < max){
+      value = max;
+    }else if(value > min){
+      value = min;
+    }
+  }
+  
   return value;
 }
 

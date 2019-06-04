@@ -41,6 +41,7 @@ void MenuInit(){
     MenuPageAdd(OLEDMenuOfCameraImage);
     MenuPageAdd(OLEDMenuOfGraphPID);
     MenuPageAdd(OLEDMenuOfElectromagnetismPID);
+    MenuPageAdd(OLEDMenuOfMotor);
     MenuPageAdd(OLEDMenuOfMotorLeft);
     MenuPageAdd(OLEDMenuOfMotorRight);
 //    MenuPageAdd(OLEDMenuOfERECT);
@@ -230,6 +231,83 @@ void OLEDMenuOfERECT(){
 
 }
 
+/*
+ * 电机参数调整
+ */
+void OLEDMenuOfMotor(){
+  if (!KEY_Read(middle)) {
+    time_delay_ms(100);
+    if (!KEY_Read(middle)) {
+      menuSwitch++;
+      LCD_CLS();
+    }
+  }
+  menuSwitch = menuSwitch % NUMBER_OF_MOTOR;
+
+  if (!KEY_Read(up)) {
+    time_delay_ms(100);
+    if (!KEY_Read(up)) {
+      if (menuSwitch == 0) {
+        PIDMotor.proportion += VARIATION_SPEED_PID;
+      } else if (menuSwitch == 1) {
+        PIDMotor.integral += VARIATION_SPEED_PID;
+      } else if (menuSwitch == 2) {
+        PIDMotor.derivative += VARIATION_SPEED_PID;
+      } else if (menuSwitch == 3) {
+        PIDMotor.setPoint += VARIATION_SPEED;
+      }
+    }
+  }else if(!KEY_Read(down)) {
+    time_delay_ms(100);
+    if (!KEY_Read(down)) {
+      if (menuSwitch == 0) {
+        PIDMotor.proportion -= VARIATION_SPEED_PID;
+      } else if (menuSwitch == 1) {
+        PIDMotor.integral -= VARIATION_SPEED_PID;
+      } else if (menuSwitch == 2) {
+        PIDMotor.derivative -= VARIATION_SPEED_PID;
+      } else if (menuSwitch == 3) {
+        PIDMotor.setPoint -= VARIATION_SPEED;
+      }
+    }
+  }
+
+  temp = (int) (PIDMotor.proportion * (1/VARIATION_SPEED_PID));
+  sprintf(txt, "P:%04d", temp);
+  LCD_P8x16Str(10, 2, (u8*) txt);
+
+  temp = (int) (PIDMotor.integral * (1/VARIATION_SPEED_PID));
+  sprintf(txt, "I:%04d", temp);
+  LCD_P8x16Str(10, 4, (u8*) txt);
+
+  temp = (int) (PIDMotor.derivative * (1/VARIATION_SPEED_PID));
+  sprintf(txt, "D:%04d", temp);
+  LCD_P8x16Str(10, 6, (u8*) txt);
+
+
+  sprintf(txt, "%04d", PIDMotor.setPoint);
+  LCD_P8x16Str(80, 4, (u8*) txt);
+
+  sprintf(txt, "%04d", (speedRightGet + speedLeftGet)/2);
+  LCD_P8x16Str(80, 6, (u8*) txt);
+
+  LCD_P8x16Str(0, 0, "Motor adjust");
+  LCD_P8x16Str(80, 2, "Speed");
+  if ((menuSwitch + 1) * 2 < 8) {
+    LCD_P8x16Str(0, (menuSwitch + 1) * 2, ">");
+  } else {
+    LCD_P8x16Str(70, (menuSwitch + 1) * 2 - 4, ">");
+  }
+
+
+  PIDMotorRight.proportion = PIDMotorLeft.proportion =   PIDMotor.proportion;
+  PIDMotorRight.integral = PIDMotorLeft.integral =   PIDMotor.integral;
+  PIDMotorRight.derivative = PIDMotorLeft.derivative =   PIDMotor.integral;
+
+
+
+
+}
 
 /*
  * 右电机参数调整

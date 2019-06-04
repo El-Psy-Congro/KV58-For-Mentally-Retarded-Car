@@ -7,5 +7,7 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define Z(x) ((x)<0?0:(x))
 
+void LimitingAmplitude(int *value, int min, int max);
+int LimitingAmplitudeVersionReturn(int value, int min, int max);
 
 #endif

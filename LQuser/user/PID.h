@@ -34,7 +34,7 @@ int PIDFuzzy(deviation *aDeviation, PID *aPID);
 //void MotorRightLocPIDCalc(int NextPoint);
 //void ErectLocPIDCalc(int NextPoint);
 
-extern PID PIDServoOfGraph,PIDServoOfElectromagnetism, PIDMotorLeft, PIDMotorRight, PIDErect;
+extern PID PIDServoOfGraph,PIDServoOfElectromagnetism, PIDMotorLeft, PIDMotorRight, PIDErect, PIDMotor;
 extern deviation graphic, inductance;
 
 #endif 

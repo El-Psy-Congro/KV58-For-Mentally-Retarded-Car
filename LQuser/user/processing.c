@@ -14,6 +14,23 @@
 
 int servoMedian = 5250, graphMedian = 0, servo = 0, angle = 0, gyroLast = 0;
 float angleFromGyro = 0, angleFromAcceleration = 0;
+/*****************************************************************/
+int dRpm = 0, M = 0;
+float turnAngle = 0.08*3.1415926/180.0, A = 0.05;
+double steeringAngle;
+
+
+/*****************************Electromagnetism************************************/
+uint16_t ADvalue[6]={0,0,0,0,0,0};
+uint16_t AD_Data[6]={0,0,0,0,0,0};
+int admax[6]={35000,35000,35000,35000,35000,35000}, admin[6]={2,2,2,2,2,2};
+int ia;
+int AD_sum=0;
+int AD_cha=0;
+int flag1=0;
+int flag2=0;
+int flag3=0;
+/*****************************************************************/
 
 /*****************************Graph*******************************/
 s8
@@ -64,25 +81,30 @@ int DataFusion(){
   }else if(0){
     servo = servoMedian - PIDPositional(ElectromagnetismProcessingOfIsland(), &PIDServoOfElectromagnetism);
 
-  }else if(!isEdgeLeft[LINE] && !isEdgeRight[LINE]){
+  }else if(!isEdgeLeft[LINE] && !isEdgeLeft[LINE]){
     servo = servoMedian - PIDPositional(ElectromagnetismProcessingOfBasics(), &PIDServoOfElectromagnetism);
+    BEE_ON;
   }else{
     servo = servoMedian + PIDFuzzy(&graphic, &PIDServoOfGraph);
+    BEE_OFF;
   }
   
-  if(GraphProcessingOfEnteringIsStraightLane()){
-    BEE_ON;
-    PIDMotorRight.setPoint = 300;
-      PIDServoOfGraph.proportion = 12;  //0.27
-  }else if(!ElectromagnetismProcessingOfLoseDataForStop()){
-    BEE_OFF;
-    PIDMotorRight.setPoint = 100;  
-    PIDServoOfGraph.proportion = 9;  //0.27
-  }else{
+  GraphProcessingOfEnteringStraightLaneAccelerate();
 
-    PIDMotorRight.setPoint = 0; 
-  }
+  DifferentialSpeed();
 
+}
+/*
+ * 差速计算
+ */
+void DifferentialSpeed(){
+  steeringAngle = ((servo - servoMedian)*turnAngle);
+  dRpm = (PIDMotor.setPoint*(M+A*tan(steeringAngle)));
+
+  LimitingAmplitude(&dRpm, -PIDMotor.setPoint*(5/4), PIDMotor.setPoint*(5/4));
+
+  PIDMotorRight.setPoint = PIDMotor.setPoint + dRpm;
+  PIDMotorLeft.setPoint = PIDMotor.setPoint - dRpm;
 }
 
 int GraphProcessing(){
@@ -213,11 +235,11 @@ int GraphProcessingOfEdgeFluctuation(){
 //  }
 
   if(isEdgeLeft[LINE] && !isEdgeRight[LINE]){
-    graph[LINE][LimitingAmplitude(edgeLeft[LINE] + laneWidth[LINE], 0, 93)] = 0;             //oled显示观测点
-    return LimitingAmplitude(edgeLeft[LINE] + laneWidth[LINE], 0, 93);
+    graph[LINE][LimitingAmplitudeVersionReturn(edgeLeft[LINE] + laneWidth[LINE], 0, 93)] = 0;             //oled显示观测点
+    return LimitingAmplitudeVersionReturn(edgeLeft[LINE] + laneWidth[LINE], 0, 93);
   }else if(!isEdgeLeft[LINE] && isEdgeRight[LINE]){
-    graph[LINE][LimitingAmplitude(edgeRight[LINE] - laneWidth[LINE], 0, 93)] = 0;
-    return LimitingAmplitude(edgeRight[LINE] - laneWidth[LINE], 0, 93);
+    graph[LINE][LimitingAmplitudeVersionReturn(edgeRight[LINE] - laneWidth[LINE], 0, 93)] = 0;
+    return LimitingAmplitudeVersionReturn(edgeRight[LINE] - laneWidth[LINE], 0, 93);
   }
 //  for(int i = ){
 //  }
@@ -503,9 +525,28 @@ s8 GraphProcessingOfLineScanFromQuarters(int i){
 }
 
 
+/*
+ * 直道加速
+ */
+void GraphProcessingOfEnteringStraightLaneAccelerate(){
+    if(IsStraightLane()){
+//      BEE_ON;
+      PIDMotor.setPoint = 170;
+      PIDServoOfGraph.proportion = 12;  //0.27
+    }else if(!ElectromagnetismProcessingOfLoseDataForStop()){
+//      BEE_OFF;
+      PIDMotor.setPoint = 70;
+      PIDServoOfGraph.proportion = 9;  //0.27
+    }else{
+      PIDMotor.setPoint = 0;
+    }
+}
 
 
 
+/*
+ * 断路检测
+ */
 bool IsDisconnectRoad(){
   if(GraphProcessingOfLineWhitePointCounting(LINE_INITIAL - 7, 0, GRAPH_WIDTH-1) < 15 ||
      GraphProcessingOfLineWhitePointCounting(LINE_INITIAL - 5, 0, GRAPH_WIDTH-1) < 15 ||
@@ -632,7 +673,7 @@ bool IsStaightLine(s8 line[], bool isExistence[], u8 initial, u8 half, u8 allowa
 
 }
 
-bool GraphProcessingOfEnteringIsStraightLane(){
+bool IsStraightLane(){
   if(IsStaightLine(edgeLeft, isEdgeLeft, 45, 30, 2, 0.5) 
      && IsStaightLine(edgeRight, isEdgeRight, 45, 30, 2, 0.5)){
     return true;
@@ -647,30 +688,94 @@ int ElectromagnetismProcessing(){
 }
 
 int ElectromagnetismProcessingOfBasics(){
+
   inductance.deviationLast = inductance.deviationNow;
-  inductance.deviationNow = (int)(ADC0_Ave(L_1,ADC_16bit,10)-ADC0_Ave(L_6,ADC_16bit,10)+ADC0_Ave(L_3,ADC_16bit,10)-ADC0_Ave(L_4,ADC_16bit,10))*10000
-    /(ADC0_Ave(L_1,ADC_16bit,10)+ADC0_Ave(L_6,ADC_16bit,10)+ADC0_Ave(L_3,ADC_16bit,10)+ADC0_Ave(L_4,ADC_16bit,10));
+  //inductance.deviationNow = (int)(ADC0_Ave(L_1,ADC_16bit,10)-ADC0_Ave(L_6,ADC_16bit,10)+ADC0_Ave(L_3,ADC_16bit,10)-ADC0_Ave(L_4,ADC_16bit,10))*10000
+    //(ADC0_Ave(L_1,ADC_16bit,10)+ADC0_Ave(L_6,ADC_16bit,10)+ADC0_Ave(L_3,ADC_16bit,10)+ADC0_Ave(L_4,ADC_16bit,10));
+     AD_Data[0]=AD_Data0;
+     AD_Data[1]=AD_Data1;
+     AD_Data[2]=AD_Data2;
+     AD_Data[3]=AD_Data3;
+     AD_Data[4]=AD_Data4;
+
+  for(ia=0;ia<6;ia++)
+  {
+                if (AD_Data[ia]>admax[ia])
+                    AD_Data[ia]=admax[ia];
+                if (AD_Data[ia]<admin[ia])
+        AD_Data[ia]=admin[ia];
+        ADvalue[ia]=(float)(400*(AD_Data[ia]-admin[ia])/(admax[ia]-admin[ia]));
+    }
+
+
+
+  if(ElectromagnetismProcessingOfIsland()){
+    return -(35000-AD_Data4)/4;
+  }
+
+
+
+    //ad04=(float)((ADvalue[0]-ADvalue[3])/(ADvalue[0]+ADvalue[3]));
+    //ad13=(float)((ADvalue[1]-ADvalue[2])/(ADvalue[1]+ADvalue[2]));
+
+    AD_cha=ADvalue[2]+ADvalue[3]-ADvalue[0]-ADvalue[1];
+    //ADoí
+    AD_sum=ADvalue[0]+ADvalue[1]+ADvalue[3]+ADvalue[4];
+
+       inductance.deviationNow=-((AD_cha*19000)/AD_sum);
+
+
 
   return inductance.deviationNow;
+
+
 }
 
-int ElectromagnetismProcessingOfIsland(){
-  inductance.deviationLast = inductance.deviationNow;
-  inductance.deviationNow = (int)(ADC0_Ave(L_2,ADC_16bit,10)-ADC0_Ave(L_5,ADC_16bit,10))*10000
-                                /(ADC0_Ave(L_2,ADC_16bit,10)+ADC0_Ave(L_5,ADC_16bit,10));
+bool ElectromagnetismProcessingOfIsland(){
+  if(AD_Data4>5000&&AD_Data0>22000)// 识别进园
+  {  flag1++;
 
-  return inductance.deviationNow;
+  }
+
+  if(flag1>0&&AD_Data3>15000)
+  {
+    flag2++;
+  }
+
+  if(flag2>0&&AD_Data0>26000&&AD_Data3>20000&&AD_Data4<3000)
+  {
+    flag3++;
+  }
+
+
+
+
+  if(flag3>0&&AD_Data0>24000&&AD_Data3>24000)
+  {
+      BEE_ON;
+      return true;
+
+  }else{
+    BEE_OFF;
+  }
+
+  if(AD_Data4<4000&&AD_Data0<20000)
+  {
+    flag1=0;
+    flag2=0;
+    flag3=0;
+  }
+
+  return false;
+
 }
 
 
 bool ElectromagnetismProcessingOfLoseDataForStop(){
-  if(ADC0_Ave(L_0,ADC_16bit,10) < 3000 &&
-      ADC0_Ave(L_1,ADC_16bit,10) < 3000 &&
-      ADC0_Ave(L_2,ADC_16bit,10) < 3000 &&
-      ADC0_Ave(L_3,ADC_16bit,10) < 3000 &&
-      ADC0_Ave(L_4,ADC_16bit,10) < 3000 &&
-      ADC0_Ave(L_5,ADC_16bit,10) < 3000 &&
-      ADC0_Ave(L_6,ADC_16bit,10) < 3000){
+  if(AD_Data0 < 3000 &&
+    AD_Data0 < 3000 &&
+    AD_Data0 < 3000 &&
+    AD_Data0 < 3000 ){
     return true;
   }else{
     return false;
@@ -685,6 +790,3 @@ void GyroAngleProcessing(){
 
 
 }
-
-
-

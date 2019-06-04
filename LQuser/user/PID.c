@@ -45,7 +45,14 @@ static const float
     ZO, ZO, PS, PM, PM, PL, PL
   };
 
-PID PIDServoOfGraph,PIDServoOfElectromagnetism, PIDMotorLeft, PIDMotorRight, PIDErect, fuzzyPIDServo;
+PID
+  PIDServoOfGraph,
+  PIDServoOfElectromagnetism,
+  PIDMotorLeft, PIDMotorRight,
+  PIDErect,
+  PIDMotor,
+  fuzzyPIDServo;
+
 deviation graphic, inductance;                                    //基于中线的偏差
 int speedSet = 0;
 
@@ -61,6 +68,12 @@ void PIDInit(){
   PIDServoOfElectromagnetism.integral = 0;
   PIDServoOfElectromagnetism.derivative = 0.20;
   PIDServoOfElectromagnetism.isDeviation = false;
+
+  PIDMotor.setPoint = 140;
+  PIDMotor.proportion = 0.100;
+  PIDMotor.integral = 0.200;
+  PIDMotor.derivative = 0;
+  PIDMotor.isDeviation = true;
 
   PIDMotorLeft.setPoint = 140;
   PIDMotorLeft.proportion = 0.200;
@@ -97,8 +110,9 @@ int PIDPositional(int NextPoint, PID *aPID){
   int
     currentError,           //当前误差
     proportionVariable,     //与比例常数相乘的变量
-    integralVariable0
-                                 vv
+    integralVariable,
+    derivativeVariable;
+      
   currentError = aPID->setPoint - NextPoint;
   aPID->sumError += currentError;
 
@@ -193,7 +207,7 @@ int PIDFuzzy(deviation *aDeviation, PID *aPID){
       temp.deviationNow -= aDeviation->interval;
       indexCurrent ++;
     }
-    indexCurrent = LimitingAmplitude(indexCurrent, INDEXMIN, INDEXMAX);
+    LimitingAmplitude(&indexCurrent, INDEXMIN, INDEXMAX);
     affiliationCurrent = (float)temp.deviationNow/(float)aDeviation->interval;
     affiliationCurrentOneMinus = ((float)aDeviation->interval - (float)temp.deviationNow)/(float)aDeviation->interval;  // = 1.0 - affiliationCurrent  但是如果在单片机上这样写会float会出现精度丢失的问题
 
@@ -203,7 +217,7 @@ int PIDFuzzy(deviation *aDeviation, PID *aPID){
       temp.deviationNow -= aDeviation->interval;
       indexCurrent --;
     }
-    indexCurrent = LimitingAmplitude(indexCurrent, INDEXMIN, INDEXMAX);
+    LimitingAmplitude(&indexCurrent, INDEXMIN, INDEXMAX);
     affiliationCurrent = ((float)aDeviation->interval - (float)temp.deviationNow)/(float)aDeviation->interval;
     affiliationCurrentOneMinus = (float)temp.deviationNow/(float)aDeviation->interval;                                  // = 1.0 - affiliationCurrent  但是如果在单片机上这样写会float会出现精度丢失的问题
 
@@ -216,7 +230,7 @@ int PIDFuzzy(deviation *aDeviation, PID *aPID){
       temp.deviationLast -= aDeviation->interval;
       indexBias ++;
     }
-    indexBias = LimitingAmplitude(indexBias, INDEXMIN, INDEXMAX);
+    LimitingAmplitude(&indexBias, INDEXMIN, INDEXMAX);
     affiliationBias = (float)temp.deviationLast/(float)aDeviation->interval;
     affiliationBiasOneMinus = ((float)aDeviation->interval - (float)temp.deviationLast)/(float)aDeviation->interval;
   }else{
@@ -225,7 +239,7 @@ int PIDFuzzy(deviation *aDeviation, PID *aPID){
       temp.deviationLast -= aDeviation->interval;
       indexBias --;
     }
-    indexBias = LimitingAmplitude(indexBias, INDEXMIN, INDEXMAX);
+    LimitingAmplitude(&indexBias, INDEXMIN, INDEXMAX);
     affiliationBias = ((float)aDeviation->interval - (float)temp.deviationLast)/(float)aDeviation->interval;
     affiliationBiasOneMinus = (float)temp.deviationLast/(float)aDeviation->interval;
   }
