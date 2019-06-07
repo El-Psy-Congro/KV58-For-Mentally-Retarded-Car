@@ -26,8 +26,8 @@ int CodingSwitch(FTM_Type * ftmn, u8 threshold){
         coding += threshold;
       }
     }
-    PIDMotorLeft->sumError = 0;
-    PIDMotorRight->sumError = 0;
+    PIDMotorLeft.sumError = 0;
+    PIDMotorRight.sumError = 0;
   }
 
   time_delay_ms(20);
