@@ -15,12 +15,16 @@
 #define VARIATION_ERECT 20
 #define VARIATION_SERVO_MEDIA 10
 
+#define THRESHOLDOFPAGE 10
+#define THRESHOLDOFADJUST 7
+
 
 
 
 short menuSelection = 0;
 short menuSwitch = 0;
 short temp;
+int adjust;
 
 menu *head = NULL, *menus;
 monitor monitorSelection;
@@ -75,6 +79,18 @@ void Menu(){
         LCD_CLS();
       }
     }
+
+  /*
+   * 编码开关
+   */
+  if(CodingSwitch(FTM1, THRESHOLDOFPAGE) < 0){
+    menus = menus->last;
+    LCD_CLS();
+  }else if(CodingSwitch(FTM1, THRESHOLDOFPAGE) > 0){
+    menus = menus->next;
+    LCD_CLS();
+  }
+
     
 
     (*menus->page)();
@@ -154,7 +170,7 @@ void OLEDMenuOfCameraImage(){
   LCD_Show_Frame100();
   Draw_Road();
   LCD_P8x16Str(0,0,"Graph");
-  sprintf(txt,"%03d",threshold);
+  sprintf(txt,"%03d",thresholdOfGraph);
   LCD_P6x8Str(100,1,(u8*)txt);
 }
 
@@ -486,6 +502,24 @@ void OLEDMenuOfGraphPID(){
       }
     }
   }
+
+  /*
+   * 编码开关
+   */
+  adjust = CodingSwitch(FTM2, THRESHOLDOFADJUST);
+  if(adjust){
+    if(menuSwitch == 0){
+      PIDServoOfGraph.proportion += adjust*VARIATION_GRAPH_PID;
+    }else if(menuSwitch == 1){
+      PIDServoOfGraph.integral += adjust*VARIATION_GRAPH_PID;
+    }else if(menuSwitch == 2){
+      PIDServoOfGraph.derivative += adjust*VARIATION_GRAPH_PID;
+    }else if(menuSwitch == 3){
+      servoMedian += adjust*VARIATION_SERVO_MEDIA;
+    }
+  }
+
+
 
   temp = (int)(PIDServoOfGraph.proportion * (1/VARIATION_GRAPH_PID));
   sprintf(txt,"P:%04d",temp);

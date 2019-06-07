@@ -70,6 +70,7 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
     #include "mathematics.h"
     #include "MicroSD.h"
     #include "fatfs.h"
+    #include "CodingSwitch.h"
 
 
 

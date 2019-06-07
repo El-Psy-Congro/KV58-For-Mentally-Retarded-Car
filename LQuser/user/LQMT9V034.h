@@ -41,7 +41,7 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 #define MAX_ROW   60
 #define MAX_COL   94 
 
-extern uint8_t threshold;
+extern uint8_t thresholdOfGraph;
 extern volatile u8  fieldOverFlag;
 extern u8 imageData[IMAGEH][IMAGEW];
 extern u16 graph[GRAPH_HIGHT][GRAPH_WIDTH];

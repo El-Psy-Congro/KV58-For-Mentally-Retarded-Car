@@ -156,7 +156,7 @@ void main(void)
 
 
   PIT_Init(PIT0, 10);           //定时器0初始化       舵机与电机的控制
-  PIT_Init(PIT1, 30);           //定时器1初始化       数据的处理
+//  PIT_Init(PIT1, 30);           //定时器1初始化       数据的处理
 //  PIT_Init(PIT2, 1000);            //定时器2初始化     陀螺仪数据的处理
   PIT_Init(PIT3, 100);          //定时器2初始化     菜单的显示
 //  GyroInit();
@@ -220,19 +220,21 @@ void main(void)
 
 //    ReadGyro();
     
-    GetUseImage();
-    LED_Ctrl(LED2, RVS);
-    GraphProcessingOfCannyEdgeDetection();
-    UART_Put_Char(UART_4, 0x00);
-    UART_Put_Char(UART_4, 0xFF);
-    UART_Put_Char(UART_4, 0x01);
-    UART_Put_Char(UART_4, 0x00);
-    for(int i = 0; i < GRAPH_HIGHT - 1; i++){
-      for(int j = 0; j < GRAPH_WIDTH - 1; j++){
-        UART_Put_Char(UART_4, Image_Use[i][j]);
-      }
-    }
+//    GetUseImage();
+//    LED_Ctrl(LED2, RVS);
+//    GraphProcessingOfCannyEdgeDetection();
+//    UART_Put_Char(UART_4, 0x00);
+//    UART_Put_Char(UART_4, 0xFF);
+//    UART_Put_Char(UART_4, 0x01);
+//    UART_Put_Char(UART_4, 0x00);
+//    for(int i = 0; i < GRAPH_HIGHT - 1; i++){
+//      for(int j = 0; j < GRAPH_WIDTH - 1; j++){
+//        UART_Put_Char(UART_4, Image_Use[i][j]);
+//      }
+//    }
 
+
+      
 
     
   }

@@ -19,7 +19,7 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 u8 imageData[IMAGEH][IMAGEW];      //图像原始数据存放
 volatile u8 Image_Use[GRAPH_HIGHT][GRAPH_WIDTH]; //压缩后之后用于存放屏幕显示数据
 u16 graph[GRAPH_HIGHT][GRAPH_WIDTH];              //二值化后用于OLED显示的数据
-uint8_t threshold;                  //OSTU大津法计算的图像阈值
+uint8_t thresholdOfGraph;                  //OSTU大津法计算的图像阈值
 volatile u8  Line_Cont=0;          //行计数
 volatile u8  fieldOverFlag=0;    //场标识
 
@@ -70,7 +70,7 @@ int MT9V034(void)
   {
 
     GetUseImage();    //采集图像数据存放数组
-    threshold = GetOSTU(imageData); //OSTU大津法 获取全局阈值
+    thresholdOfGraph = GetOSTU(imageData); //OSTU大津法 获取全局阈值
     GetBinarizationValue();     //二值化图像数据
     SeekRoad();
 
@@ -405,7 +405,7 @@ void GetBinarizationValue(void)
     for(j = 0; j < GRAPH_WIDTH; j++)
     {                                
       //if(Image_Use[i][j] >GaveValue)//平均值阈值
-      if(Image_Use[i][j] >threshold) //大津法阈值   数值越大，显示的内容越多，较浅的图像也能显示出来    
+      if(Image_Use[i][j] >thresholdOfGraph) //大津法阈值   数值越大，显示的内容越多，较浅的图像也能显示出来    
         graph[i][j] =1;        
       else                                        
         graph[i][j] =0;
@@ -938,7 +938,7 @@ uint8_t GetOSTU(uint8_t tmImage[IMAGEH][IMAGEW])
   double OmegaBack, OmegaFore, MicroBack, MicroFore, SigmaB, Sigma; // 类间方差; 
   int16_t MinValue, MaxValue; 
   uint8_t HistoGram[256];              //  
-  threshold = 0;
+  thresholdOfGraph = 0;
 
   for (j = 0; j < 256; j++)  HistoGram[j] = 0; //初始化灰度直方图 
   
@@ -978,10 +978,10 @@ uint8_t GetOSTU(uint8_t tmImage[IMAGEH][IMAGEW])
     if (Sigma > SigmaB)                    //遍历最大的类间方差g //找出最大类间方差以及对应的阈值
     {
       SigmaB = Sigma;
-      threshold = j;
+      thresholdOfGraph = j;
     }
   }
-  return threshold;                        //返回最佳阈值;
+  return thresholdOfGraph;                        //返回最佳阈值;
 } 
 /*************************************************************** 
 * 
