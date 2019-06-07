@@ -24,6 +24,9 @@ void KEY_Init(void)
   GPIO_Init(GPIOC,9,GPI,1);  
   GPIO_Init(GPIOC,12,GPI,1);
   GPIO_Init(GPIOC,13,GPI,1);
+
+
+  GPIO_Init(GPIOC,6,GPI,1);
 }
 
 u8 KEY_Read(KEYn_e keyno)
