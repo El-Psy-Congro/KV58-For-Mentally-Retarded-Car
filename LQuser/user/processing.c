@@ -70,7 +70,7 @@ s8
 
 int DataFusion(){
   GetUseImage();                       //采集图像数据存放数组  移到了IsDisconnectRoad();
-  thresholdOfGraph = GetOSTU(imageData);      //OSTU大津法 获取全局阈值
+  threshold = GetOSTU(imageData);      //OSTU大津法 获取全局阈值
   GetBinarizationValue();              //二值化图像数据
   GraphProcessing();
 

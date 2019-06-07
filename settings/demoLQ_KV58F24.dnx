@@ -51,7 +51,7 @@
         <CHIPMODE>_ "NXP_KVx_KV58F1M0M24"</CHIPMODE>
     </PE_DEVICE>
     <DebugChecksum>
-        <Checksum>2893115057</Checksum>
+        <Checksum>523569794</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
