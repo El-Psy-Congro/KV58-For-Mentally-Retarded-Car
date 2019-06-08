@@ -47,6 +47,7 @@ bool IsStaightLine(s8 line[], bool isExistence[], u8 initial, u8 half, u8 allowa
 bool GraphProcessingOfEnteringIslandforLeft();                              //左环岛
 bool GraphProcessingOfEnteringIslandforRight();                             //右环岛
 bool IsStraightLane();                                                      //直道判断
+bool IsGraphProcessingOfFinishLine();                                       //终点线判断
 void GraphProcessingOfEnteringStraightLaneAccelerate();                     //直道加速
 int GraphProcessingOfCannyEdgeDetection();                                  //canny直线检测                 未完成 且计算量大后面应该不会去写了
 

@@ -1,51 +1,51 @@
-"D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car\LQuser\user\LQ_PLL.c"
+"E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev\LQuser\user\LQ_PLL.c"
 -std=c11
 -ferror-limit=0
 -fbracket-depth=512
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car/LQuser/devices/include
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev/LQuser/devices/include
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car/LQuser/devices/startup
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev/LQuser/devices/startup
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car/LQuser/devices
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev/LQuser/devices
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car/LQuser/drivers/inc
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev/LQuser/drivers/inc
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car/LQuser/drivers/src
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev/LQuser/drivers/src
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car/LQuser/osa
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev/LQuser/osa
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car/LQuser/system
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev/LQuser/system
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car/LQuser/user
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev/LQuser/user
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car/LQuser/utilities
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev/LQuser/utilities
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car/../../..
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev/../../..
 -I
-D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\arm\inc
+E:\Works\IAR Embedded Workbench\arm\inc
 -I
-D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\arm\inc\c
+E:\Works\IAR Embedded Workbench\arm\inc\c
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car\LQuser\devices\include
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev\LQuser\devices\include
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car\LQuser\devices\startup
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev\LQuser\devices\startup
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car\LQuser\devices
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev\LQuser\devices
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car\LQuser\drivers\inc
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev\LQuser\drivers\inc
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car\LQuser\drivers\src
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev\LQuser\drivers\src
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car\LQuser\osa
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev\LQuser\osa
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car\LQuser\system
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev\LQuser\system
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car\LQuser\user
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev\LQuser\user
 -I
-D:\Project\Mentally retarded car\KV58 For mentally retarded car\KV58 For mentally retarded car\LQuser\utilities
+E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev{1}\KV58-For-Mentally-Retarded-Car-dev\LQuser\utilities
 -I
-D:\Project
+E:\协会文件
 -D__CHAR_BITS__=8
 -D__CHAR_MAX__=0xff
 -D__CHAR_MIN__=0
@@ -319,8 +319,8 @@ D:\Project
 -D__EDG_FLOAT128_ENABLING_POSSIBLE=0
 -DDEBUG=1
 -DCPU_MKV58F1M0VLQ24=1
--D_DLIB_CONFIG_FILE_HEADER_NAME="D:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 8.0\\arm\\INC\\c\\DLib_Config_Normal.h"
--D_DLIB_CONFIG_FILE_STRING="D:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 8.0\\arm\\INC\\c\\DLib_Config_Normal.h"
+-D_DLIB_CONFIG_FILE_HEADER_NAME="E:\\Works\\IAR Embedded Workbench\\arm\\INC\\c\\DLib_Config_Normal.h"
+-D_DLIB_CONFIG_FILE_STRING="E:\\Works\\IAR Embedded Workbench\\arm\\INC\\c\\DLib_Config_Normal.h"
 -D__VERSION__="IAR ANSI C/C++ Compiler V8.22.2.15995/W32 for ARM"
 -D__ICCARM_OLD_DEFINED_VAARGS__=1
 -D__VA_STACK_ALIGN__=8

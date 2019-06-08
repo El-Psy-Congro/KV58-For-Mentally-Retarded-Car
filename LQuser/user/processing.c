@@ -67,6 +67,12 @@ s8
 
 /*****************************************************************/
 
+/*************************Speed**********************************/
+bool
+  isStop = false;
+
+/*****************************************************************/
+
 
 int DataFusion(){
   GetUseImage();                       //采集图像数据存放数组  移到了IsDisconnectRoad();
@@ -88,10 +94,14 @@ int DataFusion(){
     servo = servoMedian + PIDFuzzy(&graphic, &PIDServoOfGraph);
     BEE_OFF;
   }
-  
+  if(IsGraphProcessingOfFinishLine()){
+    isStop = true;
+  }
+    
   GraphProcessingOfEnteringStraightLaneAccelerate();
 
   DifferentialSpeed();
+  
 
 }
 /*
@@ -529,17 +539,21 @@ s8 GraphProcessingOfLineScanFromQuarters(int i){
  * 直道加速
  */
 void GraphProcessingOfEnteringStraightLaneAccelerate(){
-    if(IsStraightLane()){
-//      BEE_ON;
-      PIDMotor.setPoint = 170;
-      PIDServoOfGraph.proportion = 12;  //0.27
-    }else if(!ElectromagnetismProcessingOfLoseDataForStop()){
-//      BEE_OFF;
-      PIDMotor.setPoint = 70;
-      PIDServoOfGraph.proportion = 9;  //0.27
-    }else{
-      PIDMotor.setPoint = 0;
-    }
+
+  if(isStop){
+    PIDMotor.setPoint = 0;
+    BEE_ON;
+  }else if(IsStraightLane()){
+//   BEE_ON;
+    PIDMotor.setPoint = 170;
+    PIDServoOfGraph.proportion = 12;  //0.27
+  }else if(!ElectromagnetismProcessingOfLoseDataForStop()){
+//    BEE_OFF;
+    PIDMotor.setPoint = 100;
+    PIDServoOfGraph.proportion = 9;  //0.27
+  }else{
+    PIDMotor.setPoint = 0;
+  }
 }
 
 
@@ -566,6 +580,39 @@ bool IsDisconnectRoad(){
 bool IsSharpBend(){
 
 }
+
+/*
+*终点线判断
+*返回值 bool 
+*true 表示检测到终点线
+*/
+
+bool IsGraphProcessingOfFinishLine(){
+     u8 count[2] = 0, m[2];
+     
+     
+     m[0] = graph[41][LINE_EDGE_LEFT];
+     m[1] = graph[44][LINE_EDGE_LEFT];
+     for(int j = LINE_EDGE_LEFT;j < LINE_EDGE_RIGHT;j+=2){
+       
+       if(graph[41][j] != m[0]){
+         count[0]++;
+         m[0] = graph[41][j];
+       }
+       
+       if(graph[44][j] != m[1]){
+         count[1]++;
+         m[1] = graph[44][j];
+       }
+       
+       
+     }
+     if(count[0] >10 && count[1] > 10){
+     return true;
+     }
+     
+     return false;
+  }
 
 /*
  * 直线检测

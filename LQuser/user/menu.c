@@ -215,21 +215,6 @@ void OLEDMenuOfERECT(){
     }
   }
 
-/****
-±àÂë
-**/
-  adjust = CodingSwitch(FTM2, THRESHOLDOFADJUST);
-  if(adjust){
-    if(menuSwitch == 0){
-      PIDErect.proportion += adjust*VARIATION_ERECT;
-    }else if(menuSwitch == 1){
-      PIDMotor.integral += adjust*VARIATION_ERECT;
-    }else if(menuSwitch == 2){
-      PIDErect.derivative += adjust*VARIATION_ERECT;
-    }else if(menuSwitch == 3){
-      PIDErect.setPoint += adjust*VARIATION_ERECT;
-    }
-  }
   menuSwitch = menuSwitch % NUMBER_OF_ERECT;
 
   temp = (int) (PIDErect.proportion * (1/VARIATION_ERECT_PID));
@@ -302,21 +287,7 @@ void OLEDMenuOfMotor(){
       }
     }
   }
-/***
-±àÂë
-**/
-  adjust = CodingSwitch(FTM2, THRESHOLDOFADJUST);
-  if(adjust){
-    if(menuSwitch == 0){
-      PIDMotor.proportion += adjust*VARIATION_SPEED_PID;
-    }else if(menuSwitch == 1){
-      PIDMotor.integral += adjust*VARIATION_SPEED_PID;
-    }else if(menuSwitch == 2){
-      PIDMotor.derivative += adjust*VARIATION_SPEED_PID;
-    }else if(menuSwitch == 3){
-      PIDMotor.setPoint += adjust*VARIATION_SPEED;
-    }
-  }
+
   temp = (int) (PIDMotor.proportion * (1/VARIATION_SPEED_PID));
   sprintf(txt, "P:%04d", temp);
   LCD_P8x16Str(10, 2, (u8*) txt);
@@ -394,22 +365,7 @@ void OLEDMenuOfMotorRight(){
       }
     }
   }
-/**
-±àÂë
-**/
-  adjust = CodingSwitch(FTM2, THRESHOLDOFADJUST);
-  if(adjust){
-    if(menuSwitch == 0){
-      PIDMotorRight.proportion += adjust*VARIATION_SPEED_PID;
-    }else if(menuSwitch == 1){
-      PIDMotorRight.integral += adjust*VARIATION_SPEED_PID;
-    }else if(menuSwitch == 2){
-      PIDMotorRight.derivative += adjust*VARIATION_SPEED_PID;
-    }else if(menuSwitch == 3){
-      PIDMotorRight.setPoint += adjust*VARIATION_SPEED;
-    }
-  }
-  
+
   temp = (int) (PIDMotorRight.proportion * (1/VARIATION_SPEED_PID));
   sprintf(txt, "P:%04d", temp);
   LCD_P8x16Str(10, 2, (u8*) txt);
@@ -479,23 +435,7 @@ void OLEDMenuOfMotorLeft(){
       }
     }
   }
-/***
-/**±àÂë*
-**/
-  adjust = CodingSwitch(FTM2, THRESHOLDOFADJUST);
-  if(adjust){
-    if(menuSwitch == 0){
-      PIDMotorLeft.proportion += adjust*VARIATION_SPEED_PID;
-    }else if(menuSwitch == 1){
-      PIDMotorLeft.integral += adjust*VARIATION_SPEED_PID;
-    }else if(menuSwitch == 2){
-      PIDMotorLeft.derivative += adjust*VARIATION_SPEED_PID;
-    }else if(menuSwitch == 3){
-      PIDMotorLeft.setPoint += adjust*VARIATION_SPEED;
-    }
-  }
 
-  
   temp = (int) (PIDMotorLeft.proportion * (1/VARIATION_SPEED_PID));
   sprintf(txt, "P:%04d", temp);
   LCD_P8x16Str(10, 2, (u8*) txt);
@@ -655,23 +595,7 @@ void OLEDMenuOfElectromagnetismPID(){
       }
     }
   }
-/***
-*±àÂë
-*/
-  adjust = CodingSwitch(FTM2, THRESHOLDOFADJUST);
-  if(adjust){
-    if(menuSwitch == 0){
-      PIDServoOfElectromagnetism.proportion += adjust*VARIATION_Electromagnetism_PID;
-    }else if(menuSwitch == 1){
-      PIDServoOfElectromagnetism.integral += adjust*VARIATION_Electromagnetism_PID;
-    }else if(menuSwitch == 2){
-      PIDServoOfElectromagnetism.derivative += adjust*VARIATION_Electromagnetism_PID;
-    }else if(menuSwitch == 3){
-      servoMedian += adjust*VARIATION_SERVO_MEDIA;
-    }
-  }
 
-  
   temp = (int)(PIDServoOfElectromagnetism.proportion * (1/VARIATION_Electromagnetism_PID));
   sprintf(txt,"P:%04d",temp);
   LCD_P8x16Str(20,2,(u8*)txt);
