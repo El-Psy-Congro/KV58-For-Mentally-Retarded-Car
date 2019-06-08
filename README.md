@@ -2,6 +2,6 @@
 ## 2019.6 built by Frumig
 
 developing<br>
-更行编码开关______________2019.6.8 update by Frumig
+更行编码开关______________2019.6.8 update by Frumig<br>
 增加菜单编码模式__________2019.6.8 
 
