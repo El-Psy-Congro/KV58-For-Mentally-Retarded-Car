@@ -1,14 +1,14 @@
-"D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\arm\bin\armproc.dll" 
+"E:\Works\IAR Embedded Workbench\arm\bin\armproc.dll" 
 
-"D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\arm\bin\armjlink2.dll" 
+"E:\Works\IAR Embedded Workbench\arm\bin\armjlink2.dll" 
 
-"D:\Project\Github Project\RobotAssociation\KV58-For-mentally-retarded-car\KV58-For-Mentally-Retarded-Car\release\gpio_example.out" 
+"E:\协会文件\智障小车\KV58-For-Mentally-Retarded-Car-dev\KV58-For-Mentally-Retarded-Car-dev\release\gpio_example.out" 
 
---plugin "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\arm\bin\armbat.dll" 
+--plugin "E:\Works\IAR Embedded Workbench\arm\bin\armbat.dll" 
 
---device_macro "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\arm\config\debugger\NXP\KV5x.dmac" 
+--device_macro "E:\Works\IAR Embedded Workbench\arm\config\debugger\NXP\KV5x.dmac" 
 
---flash_loader "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\arm\config\flashloader\NXP\FlashKV5xF1M0.board" 
+--flash_loader "E:\Works\IAR Embedded Workbench\arm\config\flashloader\NXP\FlashKV5xF1M0.board" 
 
 
 
